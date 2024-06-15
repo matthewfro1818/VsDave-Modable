@@ -2229,17 +2229,17 @@ class PlayState extends MusicBeatState
 				sprites.add(BG0);
 				add(BG0);
 
-				var BG2:BGSprite = new BGSprite('BG2', -2400, -1100, Paths.image('backgrounds/BG2'), 0.85, 0.85);
+				var BG2:BGSprite = new BGSprite('BG2', -2400, -1100, Paths.image('backgrounds/BG2'), null, 0.85, 0.85);
 				BG2.scale.set((1 / bgZoom) * 5, 3 / bgZoom);
 				sprites.add(BG2);
 				add(BG2);
 
-				var BG2X:BGSprite = new BGSprite('BG2X', -2400, -500, Paths.image('backgrounds/BG2X'), 0.3, 0.3);
+				var BG2X:BGSprite = new BGSprite('BG2X', -2400, -500, Paths.image('backgrounds/BG2X'), null, 0.3, 0.3);
 				BG2X.scale.set((1 / bgZoom) * 5, 3 / bgZoom);
 				sprites.add(BG2X);
 				add(BG2X);
 
-				var BG1:BGSprite = new BGSprite('backgrounds/BG1', -2400, -1400, Paths.image('backgrounds/BG1'), 0 0.3, 0.3);
+				var BG1:BGSprite = new BGSprite('backgrounds/BG1', -2400, -1400, Paths.image('backgrounds/BG1'), null, 0.3, 0.3);
 				BG1.setGraphicSize(Std.int(BG0.width * 4));
 				sprites.add(BG1);
 				add(BG1);
