@@ -2218,28 +2218,28 @@ class PlayState extends MusicBeatState
 				bgZoom = 0.35;
 				stageName = 'OMIDON';
 
-				var BG3:BGSprite = new BGSprite('backgrounds/BG3', -2400, -1400, 0.1, 0.1);
-         		BG3.setGraphicSize(Std.int(BG3.width * 7));
+				var BG3:BGSprite = new BGSprite('BG3', -2400, -1400, Paths.image('backgrounds/BG3'), null, 0.1, 0.1);
+         		        BG3.setGraphicSize(Std.int(BG3.width * 7));
 				voidShader(BG3);
 				sprites.add(BG3);
 				add(BG3);
 
-				var BG0:BGSprite = new BGSprite('backgrounds/BG0', -1500, -1700, 0.3, 0.3);
+				var BG0:BGSprite = new BGSprite('BG0', -1500, -1700, Paths.image('backgrounds/BG0'), null, 0.1, 0.1);
 				BG0.setGraphicSize(Std.int(BG0.width * 3));
 				sprites.add(BG0);
 				add(BG0);
 
-				var BG2:BGSprite = new BGSprite('backgrounds/BG2', -2400, -1100, 0.85, 0.85);
+				var BG2:BGSprite = new BGSprite('BG2', -2400, -1100, Paths.image('backgrounds/BG2'), 0.85, 0.85);
 				BG2.scale.set((1 / bgZoom) * 5, 3 / bgZoom);
 				sprites.add(BG2);
 				add(BG2);
 
-				var BG2X:BGSprite = new BGSprite('backgrounds/BG2X', -2400, -500, 0.3, 0.3);
+				var BG2X:BGSprite = new BGSprite('BG2X', -2400, -500, Paths.image('backgrounds/BG2X'), 0.3, 0.3);
 				BG2X.scale.set((1 / bgZoom) * 5, 3 / bgZoom);
 				sprites.add(BG2X);
 				add(BG2X);
 
-				var BG1:BGSprite = new BGSprite('backgrounds/BG1', -2400, -1400, 0.3, 0.3);
+				var BG1:BGSprite = new BGSprite('backgrounds/BG1', -2400, -1400, Paths.image('backgrounds/BG1'), 0 0.3, 0.3);
 				BG1.setGraphicSize(Std.int(BG0.width * 4));
 				sprites.add(BG1);
 				add(BG1);
