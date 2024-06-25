@@ -28,6 +28,7 @@ typedef CharacterFile =
 	var updateHitbox:Bool;
 	var setGraphicSize:String;
 	var effect:String;
+	var cameraPosition:Array<Float> = [0, 0];
 }
 
 typedef Anim = 
@@ -1214,6 +1215,7 @@ class Character extends FlxSprite
 				 }
 
 				globalOffset = jsonCustom.globalOffset;
+	                	cameraPosition = jsonCustom.camera_position;
 
 				for (i in jsonCustom.skins) {
 				skins.set(i.type, i.replacement);
