@@ -73,6 +73,9 @@ class SaveDataHandler
 		if (FlxG.save.data.practiceMode == null)
 			FlxG.save.data.practiceMode = false;
 
+		if (FlxG.save.data.botplay == null)
+			FlxG.save.data.botplay = false;
+
 		if (FlxG.save.data.lessLag == null)
 			FlxG.save.data.lesslag = false;
 
@@ -93,5 +96,26 @@ class SaveDataHandler
 		
 		if (FlxG.save.data.noteSplash == null)
 			FlxG.save.data.noteSplash = true;
+		
+		if (FlxG.save.data.oppM == null)
+			FlxG.save.data.oppM = false;
+		
+		if (FlxG.save.data.middleScroll == null)
+			FlxG.save.data.middleScroll = false;
+
+		if (FlxG.save.data.randomNotes == null)
+			FlxG.save.data.randomNotes = false;
+
+		if (FlxG.save.data.maniabutyeah == null)
+			FlxG.save.data.maniabutyeah = 0;
+
+		if (FlxG.save.data.randomNoteTypes == null)
+			FlxG.save.data.randomNoteTypes = 0;
+
+		if (FlxG.save.data.bothSides == null)
+			FlxG.save.data.bothSides = false;
+		
+		if (FlxG.save.data.wantShaders == null)
+			FlxG.save.data.wantShaders = true;
     }
 }

@@ -83,14 +83,14 @@ class PauseSubState extends MusicBeatSubstate
 		levelInfo.updateHitbox();
 		add(levelInfo);
 
-		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, "", 32);
-		levelDifficulty.text += CoolUtil.difficultyString();
+		var levelDifficulty:FlxText = new FlxText(25, 15 + 32, 0, "", 32);
+		levelDifficulty.text += CoolUtil.difficultyString() + '\nBy ' + CreditsPopUp.songCreator + '\n' + PlayState.blueBalls + ' Blue Balls';
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(Paths.font('comic.ttf'), 32, FlxColor.WHITE, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		levelDifficulty.antialiasing = true;
 		levelDifficulty.borderSize = 2.5;
 		levelDifficulty.updateHitbox();
-		if ((PlayState.SONG.song.toLowerCase() == 'exploitation' && !PlayState.isGreetingsCutscene) || PlayState.storyDifficulty != 1)
+		if (!PlayState.isGreetingsCutscene)
 		{
 			add(levelDifficulty);
 		}
@@ -198,6 +198,7 @@ class PauseSubState extends MusicBeatSubstate
 			case "Restart Song":
 				FlxG.sound.music.volume = 0;
 				PlayState.instance.vocals.volume = 0;
+				PlayState.allNotes = 0;
 
 				PlayState.instance.shakeCam = false;
 				PlayState.instance.camZooming = false;
@@ -216,6 +217,7 @@ class PauseSubState extends MusicBeatSubstate
 						MathGameState.failedGame = false;
 					}
 					funnyTexts.clear();
+					PlayState.allNotes = 0;
 					PlayState.characteroverride = 'none';
 					PlayState.formoverride = 'none';
 					PlayState.recursedStaticWeek = false;
@@ -248,6 +250,7 @@ class PauseSubState extends MusicBeatSubstate
 						MathGameState.failedGame = false;
 					}
 				PlayState.instance.vocals.volume = 0;
+				PlayState.allNotes = 0;
 				FlxG.switchState(new OptionsMenu());
 				OptionsMenu.onPlayState = true;
 			case "Exit to menu":
@@ -256,6 +259,7 @@ class PauseSubState extends MusicBeatSubstate
 					MathGameState.failedGame = false;
 				}
 				funnyTexts.clear();
+				PlayState.allNotes = 0;
 				PlayState.characteroverride = 'none';
 				PlayState.formoverride = 'none';
 				PlayState.recursedStaticWeek = false;
@@ -274,6 +278,9 @@ class PauseSubState extends MusicBeatSubstate
 				PlayState.instance.camZooming = false;
 				FlxG.mouse.visible = false;
 				FreeplayState.isaCustomSong = false;
+				PlayState.blueBalls = 0;
+				PlayState.chartEditorMode = false;
+				PlayState.cantSaveScore = false;
 				if (PlayState.isStoryMode) {
 				FlxG.switchState(new StoryMenuState());
 				} else {

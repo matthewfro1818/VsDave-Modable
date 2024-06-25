@@ -189,6 +189,7 @@ class CharacterSelectState extends MusicBeatState
 			var mainName:String = character.mainName;
 			var thehotemsithink:Array<Float> = character.mainnotems;
 			
+			
 			var newCharacterForms:Array<CharacterForm> = [];
 			for (newChar in character.newCharacter) {
 				newCharacterForms.push(new CharacterForm(newChar.playername, newChar.thecharactername, newChar.thenotems, newChar.notestyle));
@@ -225,7 +226,7 @@ class CharacterSelectState extends MusicBeatState
 		}
 	}
 
-		trace(characters);
+		//trace(characters);
 		Conductor.changeBPM(110);
 
 		camGame = new FlxCamera();
@@ -264,14 +265,15 @@ class CharacterSelectState extends MusicBeatState
 		{
 			bg.loadGraphic(Paths.image('backgrounds/void/redsky', 'shared'));
 			
-			#if SHADERS_ENABLED
+			if (FlxG.save.data.wantShaders) {
+			
 			bgShader = new Shaders.GlitchEffect();
 			bgShader.waveAmplitude = 0.1;
 			bgShader.waveFrequency = 5;
 			bgShader.waveSpeed = 2;
 			
 			bg.shader = bgShader.shader;
-			#end
+			}
 		}
 		add(bg);
 
@@ -472,12 +474,12 @@ class CharacterSelectState extends MusicBeatState
 	}
 	override public function update(elapsed:Float):Void
 	{
-		#if SHADERS_ENABLED
+		if (FlxG.save.data.wantShaders) {
 		if (bgShader != null)
 		{
 			bgShader.shader.uTime.value[0] += elapsed;
 		}
-		#end
+	}
 		Conductor.songPosition = FlxG.sound.music.time;
 		
 		var controlSet:Array<Bool> = [controls.LEFT_P, controls.DOWN_P, controls.UP_P, controls.RIGHT_P];

@@ -53,10 +53,12 @@ class MusicPlayerState extends MusicBeatState
         FlxG.autoPause = false;
         var initSonglist = CoolUtil.coolTextFile(Paths.txt('djSonglist')); //ah yeah dj song list
         var customList = [];
+        if (FileSystem.exists(TitleState.modFolder + '/songs')) {
         for (folder in FileSystem.readDirectory(TitleState.modFolder + '/songs')){
             if (FileSystem.isDirectory(TitleState.modFolder + '/songs/' + folder) && !customList.contains(folder))
                 customList.push('internal,' + folder + ',bf-old,good,true');
         }
+    }
 
         for (i in 0...initSonglist.length)
         {
@@ -229,14 +231,18 @@ class MusicPlayerState extends MusicBeatState
         }
 
         if (healthBar.percent < 20)
-			iconP1.changeState('losing');
-		else
-			iconP1.changeState('normal');
+            iconP1.changeState('losing');
+        else if (healthBar.percent > 80)
+            iconP1.changeState('winning');
+        else
+            iconP1.changeState('normal');
 
-		if (healthBar.percent > 80)
-			iconP2.changeState('losing');
-		else
-			iconP2.changeState('normal');
+        if (healthBar.percent > 80)
+            iconP2.changeState('losing');
+        else if (healthBar.percent < 20)
+            iconP2.changeState('winning');
+        else
+            iconP2.changeState('normal');
 
 		if (upP)
 		{

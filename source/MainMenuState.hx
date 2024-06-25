@@ -74,7 +74,7 @@ class MainMenuState extends MusicBeatState
 
 	public static var daRealEngineVer:String = 'Dave';
 	public static var engineVer:String = '3.0b';
-	public static var fanmadeEngineVer:String = '1.5.0';
+	public static var fanmadeEngineVer:String = '2.0.0';
 
 	public static var engineVers:Array<String> = 
 	[
@@ -91,6 +91,7 @@ class MainMenuState extends MusicBeatState
 	var selectUi:FlxSprite;
 	var bigIcons:FlxSprite;
 	var camFollow:FlxObject;
+	
 	public static var bgPaths:Array<String> = [
 		'Aadsta',
 		'ArtiztGmer',
@@ -163,14 +164,14 @@ class MainMenuState extends MusicBeatState
 			bg.color = FlxColor.multiply(bg.color, FlxColor.fromRGB(50, 50, 50));
 			add(bg);
 			
-			#if SHADERS_ENABLED
+			if (FlxG.save.data.wantShaders) {
 			voidShader = new Shaders.GlitchEffect();
 			voidShader.waveAmplitude = 0.1;
 			voidShader.waveFrequency = 5;
 			voidShader.waveSpeed = 2;
 			
 			bg.shader = voidShader.shader;
-			#end
+			}
 
 			magenta = new FlxSprite(-600, -200).loadGraphic(bg.graphic);
 			magenta.scrollFactor.set();
@@ -179,9 +180,9 @@ class MainMenuState extends MusicBeatState
 			magenta.color = FlxColor.multiply(0xFFfd719b, FlxColor.fromRGB(50, 50, 50));
 			add(magenta);
 
-			#if SHADERS_ENABLED
+			if (FlxG.save.data.wantShaders) {
 			magenta.shader = voidShader.shader;
-			#end
+			}
 		}
 		else
 		{
@@ -297,7 +298,7 @@ class MainMenuState extends MusicBeatState
 		versionShit.setFormat("Comic Sans MS Bold", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
-		var pressR:FlxText = new FlxText(150, 10, 0, LanguageManager.getTextString("main_resetdata"), 12);
+		var pressR:FlxText = new FlxText(225, 10, 0, LanguageManager.getTextString("main_resetdata"), 12);
 		pressR.setFormat("Comic Sans MS Bold", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		pressR.x -= versionShit.textField.textWidth;
 		pressR.antialiasing = true;
@@ -322,12 +323,12 @@ class MainMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		#if SHADERS_ENABLED
+		if (FlxG.save.data.wantShaders) {
 		if (voidShader != null)
 		{
 			voidShader.shader.uTime.value[0] += elapsed;
 		}
-		#end
+	}
 		if (FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -390,8 +391,9 @@ class MainMenuState extends MusicBeatState
 			}
 		}
 		
-		if (!selectedSomethin && canInteract)
+		if (!selectedSomethin)
 		{
+			if (canInteract) {
 			if (controls.LEFT_P)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -469,12 +471,38 @@ class MainMenuState extends MusicBeatState
 						}
 					});
 				}
+			   }
 			}
-		}
+			} else if (canInteract) {
+				if (controls.ACCEPT)
+					{
+							
+										var daChoice:String = optionShit[curSelected];
+										switch (daChoice)
+										{
+											case 'story mode':
+												FlxG.switchState(new StoryMenuState());
+											case 'freeplay' | 'freeplay glitch':
+												if (FlxG.random.bool(0.05))
+												{
+													fancyOpenURL("https://www.youtube.com/watch?v=Z7wWa1G9_30%22");
+												}
+												FlxG.switchState(new FreeplayState());
+											case 'options':
+												FlxG.switchState(new OptionsMenu());
+											case 'ost':
+												FlxG.switchState(new MusicPlayerState());
+											case 'credits':
+												FlxG.switchState(new CreditsMenuState());
+										}
+					}
+			}
+
+			
+		
 
 		super.update(elapsed);
-
-	}
+}
 
 	override function beatHit()
 	{

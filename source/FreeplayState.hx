@@ -70,6 +70,15 @@ class FreeplayState extends MusicBeatState
     public var jsonF:FreeplaySettings;
 	public var rawJsonFM:String;
     public var jsonFM:FreeplaySettings;
+	var oppOption:FlxText;
+	var randomOption:FlxText;
+	var botplayOption:FlxText;
+	var pModeOption:FlxText;
+	var keyOption:FlxText;
+	var cantEarnText:FlxText;
+	var rNText:FlxText;
+	var bothSidesText:FlxText;
+	var rPNT:Array<String> = ['Off', 'Low Chance', 'Medium Chance', 'High Chance', 'Unfair'];
 
 	var loadingPack:Bool = false;
 	
@@ -119,7 +128,7 @@ class FreeplayState extends MusicBeatState
 	private static var prevCamFollow:FlxObject;
 
 	private var iconArray:Array<HealthIcon> = [];
-
+    var modeArray:Array<FlxText> = [];
 	var titles:Array<Alphabet> = [];
 	var icons:Array<FlxSprite> = [];
 
@@ -131,6 +140,7 @@ class FreeplayState extends MusicBeatState
 	//recursed
 	var timeSincePress:Float;
 	var lastTimeSincePress:Float;
+	var cantEarn:Bool;
 
 	var pressSpeed:Float;
 	var pressSpeeds:Array<Float> = new Array<Float>();
@@ -152,6 +162,7 @@ class FreeplayState extends MusicBeatState
 		#if desktop DiscordClient.changePresence("In the Freeplay Menu", null); #end
 
 		isaCustomSong = false;
+		FlxG.save.data.randomNoteTypes = 0;
 		rawJsonF = File.getContent(Paths.json('FreeplaySettings'));
         jsonF = cast Json.parse(rawJsonF);
 		if (FileSystem.exists(TitleState.modFolder + '/data/CustomSongs.txt')) {
@@ -171,7 +182,7 @@ class FreeplayState extends MusicBeatState
 		}
 		}
 
-		trace(songColors);
+		//trace(songColors);
 
 		for (i in jsonF.skipSelect) {
 			skipSelect.push(i);
@@ -185,6 +196,12 @@ class FreeplayState extends MusicBeatState
 		awaitingExploitation = (FlxG.save.data.exploitationState == 'awaiting');
 		showCharText = FlxG.save.data.wasInCharSelect;
 
+		if (FlxG.sound.music != null)
+			{
+				if (!FlxG.sound.music.playing)
+					FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			}
+
 		if (awaitingExploitation)
 		{
 			bg = new FlxSprite(-600, -200).loadGraphic(Paths.image('backgrounds/void/redsky', 'shared'));
@@ -193,14 +210,14 @@ class FreeplayState extends MusicBeatState
 			bg.color = FlxColor.multiply(bg.color, FlxColor.fromRGB(50, 50, 50));
 			add(bg);
 			
-			#if SHADERS_ENABLED
+			if (FlxG.save.data.wantShaders) {
 			bgShader = new Shaders.GlitchEffect();
 			bgShader.waveAmplitude = 0.1;
 			bgShader.waveFrequency = 5;
 			bgShader.waveSpeed = 2;
 			
 			bg.shader = bgShader.shader;
-			#end
+			}
 			defColor = bg.color;
 		}
 		else
@@ -232,12 +249,18 @@ class FreeplayState extends MusicBeatState
 		} else {
 			descriptions.push('A mod');
 		}
+
+		if (FlxG.save.data.Mod == '') {
+			Catagories.remove('mod');
+			translatedCatagory.remove(TitleState.currentMod);
+			descriptions.remove('A mod');
+		}
 		
 		for (i in 0...Catagories.length)
 		{
 			Highscore.load();
 			if (FileSystem.exists(Paths.image('packs/' + (Catagories[i].toLowerCase())))) {
-				trace('yay');
+				//trace('yay');
 			var CurrentSongIcon:FlxSprite = new FlxSprite(0,0).loadGraphic(Paths.image('packs/' + (Catagories[i].toLowerCase()), "preload"));
 			CurrentSongIcon.centerOffsets(false);
 			CurrentSongIcon.x = (1000 * i + 1) + (512 - CurrentSongIcon.width);
@@ -252,7 +275,7 @@ class FreeplayState extends MusicBeatState
 			add(NameAlpha);
 			titles.push(NameAlpha);
 			} else {
-			trace('nae');
+		//	trace('nae');
 		var CurrentSongIcon:FlxSprite = new FlxSprite(0,0).loadGraphic(Paths.customImage(TitleState.modFolder + '/Icon'));
 			CurrentSongIcon.centerOffsets(false);
 			CurrentSongIcon.x = (1000 * i + 1) + (512 - CurrentSongIcon.width);
@@ -433,6 +456,7 @@ class FreeplayState extends MusicBeatState
 	}
 
 	var scoreBG:FlxSprite;
+	var settingsBG:FlxSprite;
 
 	public function GoToActualFreeplay()
 	{
@@ -474,9 +498,87 @@ class FreeplayState extends MusicBeatState
 		diffText.antialiasing = true;
 		diffText.scrollFactor.set();
 
+		settingsBG = new FlxSprite(FlxG.width * 0.7 - 6, 400).makeGraphic(Std.int(FlxG.width * 0.35), 300, 0xFF000000);
+		settingsBG.alpha = 0; 
+		settingsBG.scrollFactor.set();
+		add(settingsBG);
+
+		cantEarnText = new FlxText(settingsBG.x - 20, settingsBG.y - 30, "You Can\'t Save Your Score With These Options", 20);
+		cantEarnText.setFormat("Comic Sans MS Bold", 17, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		cantEarnText.antialiasing = true;
+		cantEarnText.scrollFactor.set();
+		cantEarnText.alpha = 0; 
+		cantEarnText.visible = false;
+		add(cantEarnText);
+		modeArray.push(cantEarnText);
+
+		oppOption = new FlxText(settingsBG.x, settingsBG.y, FlxG.save.data.oppM ? "Oppenent Mode: On (O)" : "Oppenent Mode: Off (O)", 20);
+		oppOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		oppOption.antialiasing = true;
+		oppOption.scrollFactor.set();
+		oppOption.alpha = 0; 
+		add(oppOption);
+		modeArray.push(oppOption);
+
+		oppOption = new FlxText(settingsBG.x, settingsBG.y, FlxG.save.data.oppM ? "Oppenent Mode: On (O)" : "Oppenent Mode: Off (O)", 20);
+		oppOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		oppOption.antialiasing = true;
+		oppOption.scrollFactor.set();
+		oppOption.alpha = 0; 
+		add(oppOption);
+		modeArray.push(oppOption);
+
+		randomOption = new FlxText(settingsBG.x, settingsBG.y + 30, FlxG.save.data.randomNotes ? "Randomize Notes: On (R)" : "Randomize Notes: Off (R)", 20);
+		randomOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		randomOption.antialiasing = true;
+		randomOption.scrollFactor.set();
+		randomOption.alpha = 0; 
+		add(randomOption);
+		modeArray.push(randomOption);
+
+		keyOption = new FlxText(settingsBG.x, settingsBG.y + 70, "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)", 20);
+		keyOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		keyOption.antialiasing = true;
+		keyOption.scrollFactor.set();
+		keyOption.alpha = 0; 
+		add(keyOption);
+		modeArray.push(keyOption);
+
+		rNText = new FlxText(settingsBG.x, settingsBG.y + 110, "Randomly Place Note Types: " + rPNT[FlxG.save.data.randomNoteTypes] + " (I)", 20);
+		rNText.setFormat(Paths.font("comic.ttf"), 16, FlxColor.WHITE, RIGHT);
+		rNText.antialiasing = true;
+		rNText.scrollFactor.set();
+		rNText.alpha = 0; 
+		add(rNText);
+		modeArray.push(rNText);
+
+		bothSidesText = new FlxText(settingsBG.x, settingsBG.y + 150, FlxG.save.data.bothSides ? "Both Sides: On (S)" : "Both Sides: Off (S)", 20);
+		bothSidesText.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		bothSidesText.antialiasing = true;
+		bothSidesText.scrollFactor.set();
+		bothSidesText.alpha = 0; 
+		add(bothSidesText);
+		modeArray.push(bothSidesText);
+
+		pModeOption = new FlxText(settingsBG.x, settingsBG.y + 230, FlxG.save.data.practiceMode ? "Practice Mode: On (P)" : "Practice Mode: Off (P)", 5);
+		pModeOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		pModeOption.antialiasing = true;
+		pModeOption.scrollFactor.set();
+		pModeOption.alpha = 0; 
+		add(pModeOption);
+		modeArray.push(pModeOption);
+
+		botplayOption = new FlxText(settingsBG.x, settingsBG.y + 260, FlxG.save.data.botplay ? "Botplay: On (B)" : "Botplay: Off (B)", 5);
+		botplayOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
+		botplayOption.antialiasing = true;
+		botplayOption.scrollFactor.set();
+		botplayOption.alpha = 0; 
+		add(botplayOption);
+		modeArray.push(botplayOption);
+
 		if (showCharText)
 		{
-			characterSelectText = new FlxText(FlxG.width, FlxG.height, 0, LanguageManager.getTextString("freeplay_skipChar"), 18);
+			characterSelectText = new FlxText(FlxG.width - 6, FlxG.height, 0, LanguageManager.getTextString("freeplay_skipChar"), 18);
 			characterSelectText.setFormat("Comic Sans MS Bold", 18, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			characterSelectText.borderSize = 1.5;
 			characterSelectText.antialiasing = true;
@@ -493,8 +595,11 @@ class FreeplayState extends MusicBeatState
 		add(scoreText);
 
 		FlxTween.tween(scoreBG,{y: 0},0.5,{ease: FlxEase.expoInOut});
+		FlxTween.tween(settingsBG,{alpha: 0.6},0.5,{ease: FlxEase.expoInOut});
 		FlxTween.tween(scoreText,{y: -5},0.5,{ease: FlxEase.expoInOut});
 		FlxTween.tween(diffText,{y: 30},0.5,{ease: FlxEase.expoInOut});
+
+		for (item in modeArray) {FlxTween.tween(item,{alpha: 1},0.5,{ease: FlxEase.expoInOut});}
 		
 		for (song in 0...grpSongs.length)
 		{
@@ -556,12 +661,19 @@ class FreeplayState extends MusicBeatState
 	{
 		super.update(elapsed);
 
-		#if SHADERS_ENABLED
+		if (FlxG.save.data.wantShaders) {
 		if (bgShader != null)
 		{
 			bgShader.shader.uTime.value[0] += elapsed;
 		}
-		#end
+	}
+		cantEarn = FlxG.save.data.botplay || FlxG.save.data.practiceMode || FlxG.save.data.oppM || FlxG.save.data.randomNotes || rPNT[FlxG.save.data.randomNoteTypes] != 'Off' || FlxG.save.data.bothSides;
+       
+		if (cantEarn && cantEarnText != null) {
+			cantEarnText.visible = true;
+		} else if (cantEarnText != null) {
+			cantEarnText.visible = false;
+		}
 
 		if (InMainFreeplayState)
 		{
@@ -601,6 +713,7 @@ class FreeplayState extends MusicBeatState
 		if (!InMainFreeplayState) 
 		{
 			scoreBG = null;
+			settingsBG = null;
 			scoreText = null;
 			diffText = null;
 			characterSelectText = null;
@@ -676,6 +789,60 @@ class FreeplayState extends MusicBeatState
 				FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
 				#end
 			}
+			if (FlxG.keys.justPressed.S)
+				{
+					FlxG.save.data.bothSides = !FlxG.save.data.bothSides;
+					bothSidesText.text = FlxG.save.data.bothSides ? "Both Sides: On (S)" : "Both Sides: Off (S)";
+					if (FlxG.save.data.bothSides) {
+						FlxG.save.data.maniabutyeah = 0;
+						keyOption.text = "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)";
+						FlxG.save.data.randomNotes = false;
+						randomOption.text = FlxG.save.data.randomNotes ? "Randomize Notes: On (R)" : "Randomize Notes: Off (R)";
+					}
+				}
+			if (FlxG.keys.justPressed.O)
+				{
+					FlxG.save.data.oppM = !FlxG.save.data.oppM;
+					oppOption.text = FlxG.save.data.oppM ? "Oppenent Mode: On (O)" : "Oppenent Mode: Off (O)";
+				}
+				if (FlxG.keys.justPressed.R)
+					{
+						FlxG.save.data.randomNotes = !FlxG.save.data.randomNotes;
+						randomOption.text = FlxG.save.data.randomNotes ? "Randomize Notes: On (R)" : "Randomize Notes: Off (R)";
+						if (!FlxG.save.data.randomNotes) {
+							FlxG.save.data.maniabutyeah = 0;
+							keyOption.text = "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)";
+						}
+					}
+					if (FlxG.keys.justPressed.U)
+						{
+							if (FlxG.save.data.randomNotes) {
+								FlxG.save.data.maniabutyeah += 1;
+							if (FlxG.save.data.maniabutyeah > 5) 
+							FlxG.save.data.maniabutyeah = 0;
+						
+							keyOption.text = "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)";
+						   }
+						}
+						if (FlxG.keys.justPressed.I)
+							{
+								FlxG.save.data.randomNoteTypes += 1;
+								if (FlxG.save.data.randomNoteTypes > 4) 
+								FlxG.save.data.randomNoteTypes = 0;
+							
+								rNText.text = "Randomly Place Note Types: " + rPNT[FlxG.save.data.randomNoteTypes] + " (I)";
+							}
+
+				if (FlxG.keys.justPressed.B)
+				{
+					FlxG.save.data.botplay = !FlxG.save.data.botplay;
+					botplayOption.text = FlxG.save.data.botplay ? "Botplay: On (B)" : "Botplay: Off (B)";
+				}
+				if (FlxG.keys.justPressed.P)
+				{
+					FlxG.save.data.practiceMode = !FlxG.save.data.practiceMode;
+					pModeOption.text = FlxG.save.data.practiceMode ? "Practice Mode: On (P)" : "Practice Mode: Off (P)";
+				}
 			if (controls.BACK && canInteract)
 			{				
 				loadingPack = true;
@@ -692,6 +859,7 @@ class FreeplayState extends MusicBeatState
 
 						for (item in icons) { item.visible = true; FlxTween.tween(item, {alpha: 1, y: item.y + 200}, 0.2, {ease: FlxEase.cubeInOut}); }
 						for (item in titles) { item.visible = true; FlxTween.tween(item, {alpha: 1, y: item.y + 200}, 0.2, {ease: FlxEase.cubeInOut}); }
+						for (item in modeArray) { item.visible = false; FlxTween.tween(item, {alpha: 0}, 0.2, {ease: FlxEase.cubeInOut}); if (item != null) {item = null;}}
 
 					    curOptDesc.visible = true; 
 						FlxTween.tween(curOptDesc, {alpha: 1, y: curOptDesc.y + 200}, 0.2, {ease: FlxEase.cubeInOut});
@@ -704,6 +872,15 @@ class FreeplayState extends MusicBeatState
 								scoreBG = null;
 							}});
 						}
+
+						if (settingsBG != null)
+							{
+								FlxTween.tween(settingsBG,{alpha: 0},0.5,{ease: FlxEase.expoInOut, onComplete: 
+								function(spr:FlxTween)
+								{
+									settingsBG = null;
+								}});
+							}
 
 						if (scoreText != null)
 						{
@@ -758,10 +935,10 @@ class FreeplayState extends MusicBeatState
 					case 'Random':
 						var randomThing = FlxG.random.int(1, songs.length - 1);
 						if (isaCustomSong) {
-							trace(randomThing);
+							//trace(randomThing);
 							PlayState.SONG = Song.loadFromCustomJson(Highscore.formatSong(songs[randomThing].songName.toLowerCase(), curDifficulty));
 							} else {
-							trace(randomThing);
+						//	trace(randomThing);
 							PlayState.SONG = Song.loadFromJson(Highscore.formatSong(songs[randomThing].songName.toLowerCase(), curDifficulty));
 							}
 						PlayState.isStoryMode = false;
@@ -972,9 +1149,12 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...iconArray.length)
 		{
 			iconArray[i].alpha = 0.6;
+			iconArray[i].changeState('normal');
 		}
 
 		iconArray[curSelected].alpha = 1;
+
+		iconArray[curSelected].changeState('winning');
 
 		for (item in grpSongs.members)
 		{

@@ -18,6 +18,8 @@ import flixel.util.FlxTimer;
 #if desktop
 import Discord.DiscordClient;
 #end
+import sys.io.Process;
+import sys.io.File;
 
 class AdminOptionsMenu extends MusicBeatState
 {
@@ -43,8 +45,7 @@ class AdminOptionsMenu extends MusicBeatState
 
 		controlsStrings = CoolUtil.coolStringFile( 
 		(FlxG.save.data.adminMode ? 'Admin Mode ON' :  'Admin Mode OFF') 
-		+ "\n" + (FlxG.save.data.botplay ? 'Bot Play ON' : 'Bot Play OFF')
-		+ "\n" + (FlxG.save.data.practiceMode ? 'Practice Mode ON' : 'Practice Mode OFF')
+		//+ "\n" + ('Open Console')
 			);
 
 		grpControls = new FlxTypedGroup<Alphabet>();
@@ -85,13 +86,10 @@ class AdminOptionsMenu extends MusicBeatState
 			{
 				case 0:
 					FlxG.save.data.adminMode = !FlxG.save.data.adminMode;
-					updateGroupControls((FlxG.save.data.adminMode ? 'Admin Mode ON' : 'Admin Mode OFF'), 1, 'Vertical');	
-				case 1:
-					FlxG.save.data.botplay = !FlxG.save.data.botplay;
-					updateGroupControls(FlxG.save.data.botplay ? 'Bot Play ON' : 'Bot Play OFF', 13, 'Vertical');
-				case 2:
-					FlxG.save.data.practiceMode = !FlxG.save.data.practiceMode;
-					updateGroupControls(FlxG.save.data.practiceMode ? 'Practice Mode ON' : 'Practice Mode OFF', 13, 'Vertical');
+					updateGroupControls((FlxG.save.data.adminMode ? 'Admin Mode ON' : 'Admin Mode OFF'), 1, 'Vertical');
+				/*case 3:
+					Sys.command("powershell.exe tee log.txt | ./VsDaveModdable.exe");
+					updateGroupControls('Open Console', 13, 'Vertical'); */ 
 			}
 		}
 	}

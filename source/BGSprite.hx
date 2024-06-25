@@ -1,24 +1,34 @@
 package;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxSprite;
+import sys.io.File;
+import sys.FileSystem;
+import flixel.graphics.FlxGraphic;
+import openfl.display.BitmapData;
 
 using StringTools;
 
 class BGSprite extends FlxSprite
 {
 	public var spriteName:String;
-	public function new(spriteName:String, posX:Float, posY:Float, path:String = '', animations:Array<Animation>, scrollX:Float = 1, scrollY:Float = 1, antialiasing:Bool = true, active:Bool = false)
+	var customPath:String;
+	public function new(spriteName:String, posX:Float, posY:Float, path:String = '', animations:Array<Animation>, scrollX:Float = 1, scrollY:Float = 1, antialiasing:Bool = true, active:Bool = false, custom:Bool = false)
 	{
 		super(posX, posY);
 		
 		this.spriteName = spriteName;
 		var hasAnimations:Bool = animations != null;
-
+		var toTrim = StringTools.replace(path, 'shared:', '');
+        customPath = StringTools.trim(toTrim);
 		if (path != '')
 		{
 			if (hasAnimations)
 			{
+				if (custom) {
+				frames = Paths.getCustomSparrowAtlas(path);
+				} else {
 				frames = Paths.getSparrowAtlas(path);
+				}
 				for (i in 0...animations.length)
 				{
 					var curAnim = animations[i];
@@ -37,7 +47,17 @@ class BGSprite extends FlxSprite
 			}
 			else
 			{
+				//trace(TitleState.modFolder + '/' + customPath);
+				//trace(path);
+				if (custom) {
+				loadGraphic(Paths.customImage(path));
+				} else {
+				if (FileSystem.exists(TitleState.modFolder + '/' + customPath)) {
+				loadGraphic((FlxGraphic.fromBitmapData(BitmapData.fromFile(TitleState.modFolder + '/' + customPath))));
+				} else {
 				loadGraphic(path);
+				}
+			}
 			}
 		}
 		this.antialiasing = antialiasing;

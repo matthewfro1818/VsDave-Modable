@@ -11,7 +11,7 @@ class HealthIcon extends FlxSprite
 {
 	public var sprTracker:FlxSprite;
 
-	public var noAaChars:Array<String> = [
+	public static var noAaChars:Array<String> = [
 		'dave-angey',
 		'bambi-3d',
 		'bf-pixel',
@@ -24,6 +24,8 @@ class HealthIcon extends FlxSprite
 	var char:String;
 	var state:String;
 	public var isPlayer:Bool;
+	var winningIcon:Bool;
+	var blank:Bool = false;
 	
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
@@ -37,24 +39,50 @@ class HealthIcon extends FlxSprite
 	{
 		if (this.char != char)
 		{
+			var file:Dynamic = '';
+
 			if (char != "none") {
 				if (FileSystem.exists('assets/images/ui/iconGrid/' + char + '.png')) {
-				loadGraphic(FlxGraphic.fromBitmapData(BitmapData.fromFile(Paths.image('ui/iconGrid/' + char, 'preload'))), true, 150, 150);
-				} else if (FileSystem.exists('mods/global characters/images/icons/' + char + '.png')) {
-					loadGraphic(Paths.customImage('mods/global characters/images/icons/' + char), true, 150, 150);
-				} else if  (FileSystem.exists(TitleState.modFolder + '/images/icons/' + char + '.png')) {
-					loadGraphic(Paths.customImage(TitleState.modFolder + '/images/icons/' + char), true, 150, 150);
+                if (FileSystem.exists(TitleState.modFolder + '/assets/images/ui/iconGrid/' + char + '.png')) {
+					//trace('found');
+					file = Paths.customImage(TitleState.modFolder + '/assets/images/ui/iconGrid/' + char);
 				} else {
-					loadGraphic(Paths.image('blank', 'shared'));
+					file = FlxGraphic.fromBitmapData(BitmapData.fromFile(Paths.image('ui/iconGrid/' + char, 'preload')));
+				}
+				} else if (FileSystem.exists('mods/global characters/images/icons/' + char + '.png')) {
+				file = Paths.customImage('mods/global characters/images/icons/' + char);
+				} else if  (FileSystem.exists(TitleState.modFolder + '/images/icons/' + char + '.png')) {
+				file = Paths.customImage(TitleState.modFolder + '/images/icons/' + char);
+				} else {
+					//trace('lol');
+					blank = true;
+					file = Paths.image('blank', 'shared');
 				}
 			} else {
-				loadGraphic(Paths.image('blank', 'shared'));
+				blank = true;
+				file = Paths.image('blank', 'shared');
 			}
-	
-			if (char != "none")
+
+			if (char != "none" && !blank) {
+			loadGraphic(file);	
+			if (width == 450) {
+			loadGraphic(file, true, Math.floor(width / 3), 150);	
+			winningIcon = true;
+			} else {
+			loadGraphic(file, true, 150, 150);	
+			}
+		}
+			
+			if (char != "none" && !blank)
 			{
 				antialiasing = !noAaChars.contains(char);
-				animation.add(char, [0, 1], 0, false, isPlayer);
+				//trace('Graphic width before setting: ' + width);
+				if (winningIcon) {
+				//trace('winning :) added');
+				animation.add(char, [0, 1, 2], 0, false, isPlayer);
+				} else {
+				animation.add(char, [0, 1], 0, false, isPlayer);	
+				}
 				animation.play(char);
 			}
 		}
@@ -70,13 +98,22 @@ class HealthIcon extends FlxSprite
 	}
 	public function changeState(charState:String)
 	{
+		if (char != "none" && !blank) {
 		switch (charState)
 		{
 			case 'normal':
 				animation.curAnim.curFrame = 0;
 			case 'losing':
 				animation.curAnim.curFrame = 1;
+			case 'winning':
+				if (winningIcon) {
+				//trace('winning :)');
+				animation.curAnim.curFrame = 2;
+				} else {
+				animation.curAnim.curFrame = 0;	
+				}
 		}
+	}
 		state = charState;
 	}
 	public function getState()
@@ -86,5 +123,14 @@ class HealthIcon extends FlxSprite
 	public function getChar():String
 	{
 		return char;
+	}
+
+	public static function iconExists(check:String):Bool
+	{
+if (FileSystem.exists('assets/images/ui/iconGrid/' + check + '.png') || FileSystem.exists('mods/global characters/images/icons/' + check + '.png') || (FileSystem.exists(TitleState.modFolder + '/images/icons/' + check + '.png'))) {
+	return true;
+} else {
+	return false;
+}
 	}
 }
