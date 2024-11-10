@@ -23,7 +23,9 @@
       "flying": false,
       "animated": false,
       "animation": "",
-      "voidShader": false
+      "voidShader": false,
+      "showsWhenLowQuality": true,
+      "shade": ""
     },
     {
       "spriteName": "stageHills",
@@ -39,7 +41,9 @@
       "flying": false,
       "animated": false,
       "animation": "",
-      "voidShader": false
+      "voidShader": false,
+      "showsWhenLowQuality": false,
+      "shade": ""
     },
     {
       "spriteName": "grassbg",
@@ -55,7 +59,9 @@
       "flying": false,
       "animated": false,
       "animation": "",
-      "voidShader": false
+      "voidShader": false,
+      "showsWhenLowQuality": false,
+      "shade": ""
     },
     {
       "spriteName": "gate",
@@ -71,7 +77,9 @@
       "flying": false,
       "animated": false,
       "animation": "",
-      "voidShader": false
+      "voidShader": false,
+      "showsWhenLowQuality": false,
+      "shade": ""
     },
     {
       "spriteName": "stageFront",
@@ -87,7 +95,9 @@
       "flying": false,
       "animated": false,
       "animation": "",
-      "voidShader": false
+      "voidShader": false,
+      "showsWhenLowQuality": true,
+      "shade": ""
     }
   ]
 }

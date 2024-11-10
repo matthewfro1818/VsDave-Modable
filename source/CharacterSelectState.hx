@@ -176,7 +176,7 @@ class CharacterSelectState extends MusicBeatState
 		}
 		rawJson = File.getContent(Paths.json('characterSelect'));
         json = cast Json.parse(rawJson);
-		rawJsonCustom = File.getContent(('mods/global characters/characterSelect.json'));
+		rawJsonCustom = File.getContent(('mods/global/characterSelect.json'));
         jsonCustom = cast Json.parse(rawJsonCustom);
 		if (FileSystem.exists(TitleState.modFolder + '/data/characterSelect.json')) {
 		rawJsonCustom2 = File.getContent((TitleState.modFolder + '/data/characterSelect.json'));
@@ -184,6 +184,8 @@ class CharacterSelectState extends MusicBeatState
 		}
 
 		var characterInSelectArray:Array<CharacterInSelect> = [];
+trace(!TitleState.baseGameDeleted.deletedCharacterImages);
+		if (!TitleState.baseGameDeleted.deletedCharacterImages) {
 
 		for (character in json.characters) { // Normal
 			var mainName:String = character.mainName;
@@ -197,7 +199,32 @@ class CharacterSelectState extends MusicBeatState
 			
 			characters.push(new CharacterInSelect(mainName, thehotemsithink, newCharacterForms));
 		}
-		if (FileSystem.exists('mods/global characters/characterSelect.json')) {
+	} else {
+
+			var newCharacterFormsbf:Array<CharacterForm> = [];
+			var newCharacterFormsdave:Array<CharacterForm> = [];
+			var newCharacterFormsshaggy:Array<CharacterForm> = [];
+			
+			newCharacterFormsbf.push(new CharacterForm('bf', 'Boyfriend', [1, 1, 1, 1], ''));
+			newCharacterFormsbf.push(new CharacterForm('bf-pixel', 'Pixel Boyfriend', [1, 1, 1, 1], ''));
+			
+			
+			characters.push(new CharacterInSelect('bf', [1, 1, 1, 1], newCharacterFormsbf));
+
+			newCharacterFormsdave.push(new CharacterForm('dave', 'Dave', [0.25, 0.25, 2, 2], ''));
+			
+			
+			characters.push(new CharacterInSelect('dave', [0.25, 0.25, 2, 2], newCharacterFormsdave));
+
+			newCharacterFormsshaggy.push(new CharacterForm('shaggy', 'Shaggy', [1, 1, 1, 1], ''));
+			newCharacterFormsshaggy.push(new CharacterForm('supershaggy', 'Shaggy (0.001%)', [1, 1, 1, 1], ''));
+			newCharacterFormsshaggy.push(new CharacterForm('godshaggy', 'Shaggy (0.002%)', [1, 1, 1, 1], ''));
+			newCharacterFormsshaggy.push(new CharacterForm('redshaggy', 'Red Shaggy', [1, 1, 1, 1], ''));
+			
+			
+			characters.push(new CharacterInSelect('shaggy', [1, 1, 1, 1], newCharacterFormsshaggy));
+	}
+		if (FileSystem.exists('mods/global/characterSelect.json')) {
 		for (character in jsonCustom.characters) { // For Globle Characters
 			var mainName:String = character.mainName;
 			var thehotemsithink:Array<Float> = character.mainnotems;
@@ -205,6 +232,7 @@ class CharacterSelectState extends MusicBeatState
 			var newCharacterForms:Array<CharacterForm> = [];
 			for (newChar in character.newCharacter) {
 				newCharacterForms.push(new CharacterForm(newChar.playername, newChar.thecharactername, newChar.thenotems, newChar.notestyle));
+				unlockCharacter(newChar.playername);
 			}
 			
 			characters.push(new CharacterInSelect(mainName, thehotemsithink, newCharacterForms));
@@ -219,6 +247,7 @@ class CharacterSelectState extends MusicBeatState
 			var newCharacterForms:Array<CharacterForm> = [];
 			for (newChar in character.newCharacter) {
 				newCharacterForms.push(new CharacterForm(newChar.playername, newChar.thecharactername, newChar.thenotems, newChar.notestyle));
+				unlockCharacter(newChar.playername);
 			}
 			
 			characters.push(new CharacterInSelect(mainName, thehotemsithink, newCharacterForms));
@@ -257,7 +286,7 @@ class CharacterSelectState extends MusicBeatState
 		//create BG
 
 		var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('backgrounds/shared/sky_night'));
-		bg.antialiasing = true;
+		bg.antialiasing = FlxG.save.data.antialiasing;
 		bg.scrollFactor.set(0.75, 0.75);
 		bg.active = false;
 		
@@ -317,7 +346,7 @@ class CharacterSelectState extends MusicBeatState
 		legs.frames = Paths.getSparrowAtlas('characters/shaggy_god', 'shared');
 		legs.animation.addByPrefix('legs', "solo_legs", 30);
 		legs.animation.play('legs');
-		legs.antialiasing = true;
+		legs.antialiasing = FlxG.save.data.antialiasing;
 		legs.flipX = true;
 		legs.updateHitbox();
 		legs.offset.set(legs.frameWidth / 2, 10);
@@ -351,7 +380,7 @@ class CharacterSelectState extends MusicBeatState
 		characterText.borderSize = 5;
 		characterText.screenCenter(X);
 		characterText.cameras = [camHUD];
-		characterText.antialiasing = true;
+		characterText.antialiasing = FlxG.save.data.antialiasing;
 		characterText.y = FlxG.height - 180;
 		add(characterText);
 		
@@ -363,26 +392,26 @@ class CharacterSelectState extends MusicBeatState
 		resetText.y -= resetText.textField.textHeight - 100;
 		resetText.borderSize = 3;
 		resetText.cameras = [camHUD];
-		resetText.antialiasing = true;
+		resetText.antialiasing = FlxG.save.data.antialiasing;
 		resetText.visible = false;
 		add(resetText);
 
 		funnyIconMan = new HealthIcon('bf', true);
 		funnyIconMan.cameras = [camHUD];
 		funnyIconMan.visible = false;
-		funnyIconMan.antialiasing = true;
+		funnyIconMan.antialiasing = FlxG.save.data.antialiasing;
 		updateIconPosition();
 		add(funnyIconMan);
 
 		var tutorialThing:FlxSprite = new FlxSprite(-110, -30).loadGraphic(Paths.image('ui/charSelectGuide'));
 		tutorialThing.setGraphicSize(Std.int(tutorialThing.width * 1.5));
-		tutorialThing.antialiasing = true;
+		tutorialThing.antialiasing = FlxG.save.data.antialiasing;
 		tutorialThing.cameras = [camHUD];
 		add(tutorialThing);
 
 		var arrowLeft:FlxSprite = new FlxSprite(10,0).loadGraphic(Paths.image("ui/ArrowLeft_Idle", "preload"));
 		arrowLeft.screenCenter(Y);
-		arrowLeft.antialiasing = true;
+		arrowLeft.antialiasing = FlxG.save.data.antialiasing;
 		arrowLeft.scrollFactor.set();
 		arrowLeft.cameras = [camHUD];
 		arrows[0] = arrowLeft;
@@ -390,7 +419,7 @@ class CharacterSelectState extends MusicBeatState
 
 		var arrowRight:FlxSprite = new FlxSprite(-5,0).loadGraphic(Paths.image("ui/ArrowRight_Idle", "preload"));
 		arrowRight.screenCenter(Y);
-		arrowRight.antialiasing = true;
+		arrowRight.antialiasing = FlxG.save.data.antialiasing;
 		arrowRight.x = 1280 - arrowRight.width - 5;
 		arrowRight.scrollFactor.set();
 		arrowRight.cameras = [camHUD];
@@ -433,7 +462,7 @@ class CharacterSelectState extends MusicBeatState
 			babyArrow.animation.addByPrefix('purple', 'arrowLEFT0');
 			babyArrow.animation.addByPrefix('red', 'arrowRIGHT0');
 
-			babyArrow.antialiasing = true;
+			babyArrow.antialiasing = FlxG.save.data.antialiasing;
 			babyArrow.setGraphicSize(Std.int(babyArrow.width * 0.7));
 
 			babyArrow.x += 160 * 0.7 * i;

@@ -76,8 +76,20 @@ class SaveDataHandler
 		if (FlxG.save.data.botplay == null)
 			FlxG.save.data.botplay = false;
 
-		if (FlxG.save.data.lessLag == null)
-			FlxG.save.data.lesslag = false;
+		if (FlxG.save.data.playerLight == null)
+			FlxG.save.data.playerLight = true;
+
+		if (FlxG.save.data.cpuLight == null)
+			FlxG.save.data.cpuLight = true;
+
+		if (FlxG.save.data.ratingsPopUp == null)
+			FlxG.save.data.ratingsPopUp = true;
+
+		if (FlxG.save.data.stage == null)
+			FlxG.save.data.stage = true;
+
+		if (FlxG.save.data.chars == null)
+			FlxG.save.data.chars = true;
 
 		if (FlxG.save.data.freeplayCuts == null)
 			FlxG.save.data.freeplayCuts = false;
@@ -117,5 +129,47 @@ class SaveDataHandler
 		
 		if (FlxG.save.data.wantShaders == null)
 			FlxG.save.data.wantShaders = true;
+
+		if (FlxG.save.data.hideHud == null)
+			FlxG.save.data.hideHud = false;
+
+		if (FlxG.save.data.showcaseMode == null)
+			FlxG.save.data.showcaseMode = false;
+
+		if (FlxG.save.data.creditsPop == null)
+			FlxG.save.data.creditsPop = true;
+
+		/*if (FlxG.save.data.noteSplashTransparent == null)
+			FlxG.save.data.noteSplashTransparent = 1; */
+
+			if (FlxG.save.data.flashing == null)
+				FlxG.save.data.flashing = true;
+
+			if (FlxG.save.data.cameraZoom == null)
+				FlxG.save.data.cameraZoom = true;
+
+			if (FlxG.save.data.comboStack == null)
+				FlxG.save.data.comboStack = true;
+
+			if (FlxG.save.data.discord == null)
+				FlxG.save.data.discord = false;
+
+			if (FlxG.save.data.antialiasing == null)
+				FlxG.save.data.antialiasing = true;
+
+			if (FlxG.save.data.healthBO == null)
+				FlxG.save.data.healthBO = 1;
+
+			if (FlxG.save.data.lowQ == null)
+				FlxG.save.data.lowQ = false;
+
+			if (FlxG.save.data.curRS == null)
+				FlxG.save.data.curRS = '';
+
+			if (FlxG.save.data.checkVersion == null)
+				FlxG.save.data.checkVersion = true;
+
+			if (FlxG.save.data.csAllSongs == null)
+				FlxG.save.data.csAllSongs = false;
     }
 }

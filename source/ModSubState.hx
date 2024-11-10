@@ -59,7 +59,7 @@ menuItems.push(new ModOption('Exit'));
 
 		bg = new FlxBackdrop(Paths.image('ui/checkeredBG', 'preload'), 1, 1, true, true, 1, 1);
 		bg.alpha = 0;
-		bg.antialiasing = true;
+		bg.antialiasing = FlxG.save.data.antialiasing;
 		bg.scrollFactor.set();
 		add(bg);
 
@@ -111,6 +111,12 @@ menuItems.push(new ModOption('Exit'));
 		{
 			selectOption();
 		}
+
+		if (controls.BACK)
+			{
+			close();
+			inMods = false;
+			}
 	}
 	function selectOption()
 	{

@@ -63,12 +63,20 @@ class MusicPlayerState extends MusicBeatState
         for (i in 0...initSonglist.length)
         {
             var splitstring:Array<String> = initSonglist[i].split(",");
-
+        
+            
+           
             songs.push(new PlaySongMetadata(splitstring[1], splitstring[0] == "external", splitstring[2],splitstring[3] == "bad",splitstring[1] != 'vs-dave-rap'));
 
             if (splitstring[0] != "external" && splitstring[1] != 'vs-dave-rap') //remove this later
             {
                 songs.push(new PlaySongMetadata(splitstring[1], splitstring[0] == "external", splitstring[2],splitstring[3] == "bad",false));
+            }
+            if (TitleState.baseGameDeleted.deletedSongs) {
+                songs = [new PlaySongMetadata('warmup', false, 'dave',false,true)];
+
+                songs.push(new PlaySongMetadata('warmup', false, 'dave',false,false));
+                    
             }
         }
         var secretSongs:Array<Dynamic> = [
@@ -81,6 +89,7 @@ class MusicPlayerState extends MusicBeatState
         ];
         for (i in 0...secretSongs.length)
         {
+            if (!TitleState.baseGameDeleted.deletedSongs) {
             var unlockSong = false;
             unlockSong = switch (secretSongs[i][0].toLowerCase())
             {
@@ -96,13 +105,16 @@ class MusicPlayerState extends MusicBeatState
             }
             if (unlockSong)
             {
+                
                 var bad = secretSongs[i][2] != null ? secretSongs[i][2] : false;
                 songs.push(new PlaySongMetadata(secretSongs[i][0], false, secretSongs[i][1], bad, secretSongs[i][0] != 'vs-dave-rap-two'));
                 if (secretSongs[i][0] != 'vs-dave-rap-two')
                 {
                     songs.push(new PlaySongMetadata(secretSongs[i][0], false, secretSongs[i][1], bad, false));
                 }
+            
             }
+        }
         }
 
         for (i in 0...customList.length)
@@ -129,6 +141,7 @@ class MusicPlayerState extends MusicBeatState
 		add(grpSongs);
 
         #if desktop
+        if (FlxG.save.data.discord)
         DiscordClient.changePresence("In the OST Menu", null);
         #end
 
@@ -171,7 +184,7 @@ class MusicPlayerState extends MusicBeatState
 		barText.setFormat(Paths.font("comic.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		barText.scrollFactor.set();
         barText.borderSize = 1.5;
-		barText.antialiasing = true;
+		barText.antialiasing = FlxG.save.data.antialiasing;
         barText.screenCenter(X);
 		add(barText);
 
@@ -213,19 +226,23 @@ class MusicPlayerState extends MusicBeatState
             if (songs[curSelected].hasVocals || songs[curSelected].ExternalSong)
             {
                 #if desktop
+                if (FlxG.save.data.discord) {
                 DiscordClient.changePresence('In The OST Menu', '\nListening To: ' +
                     CoolUtil.formatString(songs[curSelected].songName, '-') + ' | ' + 
                     currentTimeFormatted + ' / ' + lengthFormatted,
                     null);
+                }
                 #end
             }
             else
             {
                 #if desktop
+                if (FlxG.save.data.discord) {
                 DiscordClient.changePresence('In The OST Menu', '\nListening To: ' +
                     CoolUtil.formatString(songs[curSelected].songName, '-') + ' Instrumental | ' +
                     currentTimeFormatted + ' / ' + lengthFormatted, 
                     null);
+                }
                 #end
             }
         }
@@ -280,6 +297,7 @@ class MusicPlayerState extends MusicBeatState
             if (currentlyplaying)
             {
                 #if desktop
+                if (FlxG.save.data.discord)
                 DiscordClient.changePresence('In The OST Menu', null);
                 #end
                 

@@ -196,7 +196,6 @@ class Character extends FlxSprite
 
 				flipX = true;
 
-				
 			case 'none':
 				frames = Paths.getSparrowAtlas('blank', 'shared');
 				

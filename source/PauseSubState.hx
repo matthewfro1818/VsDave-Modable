@@ -16,6 +16,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.addons.display.FlxBackdrop;
 import lime.app.Application;
+import options.OptionsMenu;
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -70,7 +71,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		bg = new FlxBackdrop(Paths.image('ui/checkeredBG', 'preload'), 1, 1, true, true, 1, 1);
 		bg.alpha = 0;
-		bg.antialiasing = true;
+		bg.antialiasing = FlxG.save.data.antialiasing;
 		bg.scrollFactor.set();
 		add(bg);
 
@@ -78,7 +79,7 @@ class PauseSubState extends MusicBeatSubstate
 		levelInfo.text += PlayState.SONG.song;
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(Paths.font("comic.ttf"), 32, FlxColor.WHITE, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		levelInfo.antialiasing = true;
+		levelInfo.antialiasing = FlxG.save.data.antialiasing;
 		levelInfo.borderSize = 2.5;
 		levelInfo.updateHitbox();
 		add(levelInfo);
@@ -87,7 +88,7 @@ class PauseSubState extends MusicBeatSubstate
 		levelDifficulty.text += CoolUtil.difficultyString() + '\nBy ' + CreditsPopUp.songCreator + '\n' + PlayState.blueBalls + ' Blue Balls';
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(Paths.font('comic.ttf'), 32, FlxColor.WHITE, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		levelDifficulty.antialiasing = true;
+		levelDifficulty.antialiasing = FlxG.save.data.antialiasing;
 		levelDifficulty.borderSize = 2.5;
 		levelDifficulty.updateHitbox();
 		if (!PlayState.isGreetingsCutscene)
@@ -113,7 +114,7 @@ class PauseSubState extends MusicBeatSubstate
 					doALittleTrolling(levelDifficulty);
 			}
 		}});
-		if (PlayState.isStoryMode || FreeplayState.skipSelect.contains(PlayState.SONG.song.toLowerCase()) || PlayState.instance.localFunny == PlayState.CharacterFunnyEffect.Recurser)
+		if (PlayState.isStoryMode || FreeplayState.skipSelect.contains(PlayState.SONG.song.toLowerCase()) && !FlxG.save.data.csAllSongs || PlayState.instance.localFunny == PlayState.CharacterFunnyEffect.Recurser)
 		{
 			menuItems.remove(PauseOption.getOption(menuItems, 'Change Character'));
 		}
@@ -198,7 +199,9 @@ class PauseSubState extends MusicBeatSubstate
 			case "Restart Song":
 				FlxG.sound.music.volume = 0;
 				PlayState.instance.vocals.volume = 0;
-				PlayState.allNotes = 0;
+				if (!PlayState.isStoryMode) {
+					PlayState.allNotes = 0;
+					}
 
 				PlayState.instance.shakeCam = false;
 				PlayState.instance.camZooming = false;
@@ -217,7 +220,9 @@ class PauseSubState extends MusicBeatSubstate
 						MathGameState.failedGame = false;
 					}
 					funnyTexts.clear();
-					PlayState.allNotes = 0;
+					if (!PlayState.isStoryMode) {
+						PlayState.allNotes = 0;
+						}
 					PlayState.characteroverride = 'none';
 					PlayState.formoverride = 'none';
 					PlayState.recursedStaticWeek = false;
@@ -250,9 +255,11 @@ class PauseSubState extends MusicBeatSubstate
 						MathGameState.failedGame = false;
 					}
 				PlayState.instance.vocals.volume = 0;
+				if (!PlayState.isStoryMode) {
 				PlayState.allNotes = 0;
+				}
 				FlxG.switchState(new OptionsMenu());
-				OptionsMenu.onPlayState = true;
+				options.OptionsMenu.onPlayState = true;
 			case "Exit to menu":
 				if (MathGameState.failedGame)
 				{
@@ -314,7 +321,7 @@ class PauseSubState extends MusicBeatSubstate
 				difficulty.text += levelDifficulty.text;
 				difficulty.scrollFactor.set();
 				difficulty.setFormat(Paths.font('comic.ttf'), 32, FlxColor.WHITE, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				difficulty.antialiasing = true;
+				difficulty.antialiasing = FlxG.save.data.antialiasing;
 				difficulty.borderSize = 2;
 				difficulty.updateHitbox();
 				funnyTexts.add(difficulty);

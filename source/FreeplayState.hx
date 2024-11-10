@@ -78,6 +78,7 @@ class FreeplayState extends MusicBeatState
 	var cantEarnText:FlxText;
 	var rNText:FlxText;
 	var bothSidesText:FlxText;
+	var csaText:FlxText;
 	var rPNT:Array<String> = ['Off', 'Low Chance', 'Medium Chance', 'High Chance', 'Unfair'];
 
 	var loadingPack:Bool = false;
@@ -159,7 +160,10 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
-		#if desktop DiscordClient.changePresence("In the Freeplay Menu", null); #end
+		#if desktop 
+		if (FlxG.save.data.discord)
+		DiscordClient.changePresence("In the Freeplay Menu", null); 
+		#end
 
 		isaCustomSong = false;
 		FlxG.save.data.randomNoteTypes = 0;
@@ -243,6 +247,13 @@ class FreeplayState extends MusicBeatState
 			'Extra songs for you to play',
 			'cmd.exe'];
 		}
+		if (TitleState.baseGameDeleted.deletedCharts || TitleState.baseGameDeleted.deletedSongs) {
+			Catagories = ['dave', 'mod'];
+			translatedCatagory = [
+			LanguageManager.getTextString('freeplay_dave'),
+		    TitleState.currentMod];
+			descriptions = ['See the Story'];
+		}
 
 		if (FileSystem.exists(TitleState.modFolder + '/desc.txt')) {
 			descriptions.push(Paths.customFile(TitleState.modFolder + '/desc.txt'));
@@ -265,7 +276,7 @@ class FreeplayState extends MusicBeatState
 			CurrentSongIcon.centerOffsets(false);
 			CurrentSongIcon.x = (1000 * i + 1) + (512 - CurrentSongIcon.width);
 			CurrentSongIcon.y = (FlxG.height / 2) - 256;
-			CurrentSongIcon.antialiasing = true;
+			CurrentSongIcon.antialiasing = FlxG.save.data.antialiasing;
 
 			var NameAlpha:Alphabet = new Alphabet(40, (FlxG.height / 2) - 282, translatedCatagory[i], true, false);
 			NameAlpha.x = CurrentSongIcon.x;
@@ -280,7 +291,7 @@ class FreeplayState extends MusicBeatState
 			CurrentSongIcon.centerOffsets(false);
 			CurrentSongIcon.x = (1000 * i + 1) + (512 - CurrentSongIcon.width);
 			CurrentSongIcon.y = (FlxG.height / 2) - 256;
-			CurrentSongIcon.antialiasing = true;
+			CurrentSongIcon.antialiasing = FlxG.save.data.antialiasing;
 
 			var NameAlpha:Alphabet = new Alphabet(40, (FlxG.height / 2) - 282, translatedCatagory[i], true, false);
 			NameAlpha.x = CurrentSongIcon.x;
@@ -311,7 +322,7 @@ class FreeplayState extends MusicBeatState
 		curOptDesc.setFormat("Comic Sans MS Bold", 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		curOptDesc.scrollFactor.set(0, 0);
 		curOptDesc.borderSize = 2;
-		curOptDesc.antialiasing = true;
+		curOptDesc.antialiasing = FlxG.save.data.antialiasing;
 		curOptDesc.screenCenter(X);
 		curOptDesc.y = FlxG.height - 58;
 		add(curOptDesc);
@@ -391,10 +402,12 @@ class FreeplayState extends MusicBeatState
 			case 'dave':
 				addWeek(['Random'], 0, ['dave']);
 				addWeek(['Warmup'], 0, ['dave']);
+				if (!TitleState.baseGameDeleted.deletedCharts || !TitleState.baseGameDeleted.deletedSongs) {
 				addWeek(['House', 'Insanity', 'Polygonized'], 1, ['dave', 'dave-annoyed', 'dave-angey']);
 				addWeek(['Blocked', 'Corn-Theft', 'Maze'], 2, ['bambi-new', 'bambi-new', 'bambi-new']);
 				addWeek(['Splitathon'], 3, ['the-duo']);
 				addWeek(['Shredder', 'Greetings', 'Interdimensional', 'Rano'], 4, ['bambi-new', 'tristan-festival', 'dave-festival-3d', 'dave-festival']);
+				}
 			case 'joke':
 				addWeek(['Random'], 0, ['dave']);
 				if (FlxG.save.data.hasPlayedMasterWeek)
@@ -484,7 +497,7 @@ class FreeplayState extends MusicBeatState
 
 		scoreText = new FlxText(FlxG.width * 0.7, 0, 0, "", 32);
 		scoreText.setFormat(Paths.font("comic.ttf"), 32, FlxColor.WHITE, LEFT);
-		scoreText.antialiasing = true;
+		scoreText.antialiasing = FlxG.save.data.antialiasing;
 		scoreText.y = -225;
 		scoreText.scrollFactor.set();
 
@@ -495,7 +508,7 @@ class FreeplayState extends MusicBeatState
 
 		diffText = new FlxText(scoreText.x, scoreText.y + 15, 0, "", 24);
 		diffText.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, LEFT);
-		diffText.antialiasing = true;
+		diffText.antialiasing = FlxG.save.data.antialiasing;
 		diffText.scrollFactor.set();
 
 		settingsBG = new FlxSprite(FlxG.width * 0.7 - 6, 400).makeGraphic(Std.int(FlxG.width * 0.35), 300, 0xFF000000);
@@ -505,7 +518,7 @@ class FreeplayState extends MusicBeatState
 
 		cantEarnText = new FlxText(settingsBG.x - 20, settingsBG.y - 30, "You Can\'t Save Your Score With These Options", 20);
 		cantEarnText.setFormat("Comic Sans MS Bold", 17, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		cantEarnText.antialiasing = true;
+		cantEarnText.antialiasing = FlxG.save.data.antialiasing;
 		cantEarnText.scrollFactor.set();
 		cantEarnText.alpha = 0; 
 		cantEarnText.visible = false;
@@ -514,15 +527,7 @@ class FreeplayState extends MusicBeatState
 
 		oppOption = new FlxText(settingsBG.x, settingsBG.y, FlxG.save.data.oppM ? "Oppenent Mode: On (O)" : "Oppenent Mode: Off (O)", 20);
 		oppOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		oppOption.antialiasing = true;
-		oppOption.scrollFactor.set();
-		oppOption.alpha = 0; 
-		add(oppOption);
-		modeArray.push(oppOption);
-
-		oppOption = new FlxText(settingsBG.x, settingsBG.y, FlxG.save.data.oppM ? "Oppenent Mode: On (O)" : "Oppenent Mode: Off (O)", 20);
-		oppOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		oppOption.antialiasing = true;
+		oppOption.antialiasing = FlxG.save.data.antialiasing;
 		oppOption.scrollFactor.set();
 		oppOption.alpha = 0; 
 		add(oppOption);
@@ -530,39 +535,47 @@ class FreeplayState extends MusicBeatState
 
 		randomOption = new FlxText(settingsBG.x, settingsBG.y + 30, FlxG.save.data.randomNotes ? "Randomize Notes: On (R)" : "Randomize Notes: Off (R)", 20);
 		randomOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		randomOption.antialiasing = true;
+		randomOption.antialiasing = FlxG.save.data.antialiasing;
 		randomOption.scrollFactor.set();
 		randomOption.alpha = 0; 
 		add(randomOption);
 		modeArray.push(randomOption);
 
-		keyOption = new FlxText(settingsBG.x, settingsBG.y + 70, "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)", 20);
+		keyOption = new FlxText(settingsBG.x, settingsBG.y + 60, "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)", 20);
 		keyOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		keyOption.antialiasing = true;
+		keyOption.antialiasing = FlxG.save.data.antialiasing;
 		keyOption.scrollFactor.set();
 		keyOption.alpha = 0; 
 		add(keyOption);
 		modeArray.push(keyOption);
 
-		rNText = new FlxText(settingsBG.x, settingsBG.y + 110, "Randomly Place Note Types: " + rPNT[FlxG.save.data.randomNoteTypes] + " (I)", 20);
+		rNText = new FlxText(settingsBG.x, settingsBG.y + 90, "Randomly Place Note Types: " + rPNT[FlxG.save.data.randomNoteTypes] + " (I)", 20);
 		rNText.setFormat(Paths.font("comic.ttf"), 16, FlxColor.WHITE, RIGHT);
-		rNText.antialiasing = true;
+		rNText.antialiasing = FlxG.save.data.antialiasing;
 		rNText.scrollFactor.set();
 		rNText.alpha = 0; 
 		add(rNText);
 		modeArray.push(rNText);
 
-		bothSidesText = new FlxText(settingsBG.x, settingsBG.y + 150, FlxG.save.data.bothSides ? "Both Sides: On (S)" : "Both Sides: Off (S)", 20);
+		bothSidesText = new FlxText(settingsBG.x, settingsBG.y + 110, FlxG.save.data.bothSides ? "Both Sides: On (S)" : "Both Sides: Off (S)", 20);
 		bothSidesText.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		bothSidesText.antialiasing = true;
+		bothSidesText.antialiasing = FlxG.save.data.antialiasing;
 		bothSidesText.scrollFactor.set();
 		bothSidesText.alpha = 0; 
 		add(bothSidesText);
 		modeArray.push(bothSidesText);
 
+		csaText = new FlxText(settingsBG.x, settingsBG.y + 140, FlxG.save.data.csAllSongs ? "Character Select on All Songs: On (Y)" : "Character Select on All Songs: Off (Y)", 20);
+		csaText.setFormat(Paths.font("comic.ttf"), 14, FlxColor.WHITE, RIGHT);
+		csaText.antialiasing = FlxG.save.data.antialiasing;
+		csaText.scrollFactor.set();
+		csaText.alpha = 0; 
+		add(csaText);
+		modeArray.push(csaText);
+
 		pModeOption = new FlxText(settingsBG.x, settingsBG.y + 230, FlxG.save.data.practiceMode ? "Practice Mode: On (P)" : "Practice Mode: Off (P)", 5);
 		pModeOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		pModeOption.antialiasing = true;
+		pModeOption.antialiasing = FlxG.save.data.antialiasing;
 		pModeOption.scrollFactor.set();
 		pModeOption.alpha = 0; 
 		add(pModeOption);
@@ -570,7 +583,7 @@ class FreeplayState extends MusicBeatState
 
 		botplayOption = new FlxText(settingsBG.x, settingsBG.y + 260, FlxG.save.data.botplay ? "Botplay: On (B)" : "Botplay: Off (B)", 5);
 		botplayOption.setFormat(Paths.font("comic.ttf"), 24, FlxColor.WHITE, RIGHT);
-		botplayOption.antialiasing = true;
+		botplayOption.antialiasing = FlxG.save.data.antialiasing;
 		botplayOption.scrollFactor.set();
 		botplayOption.alpha = 0; 
 		add(botplayOption);
@@ -581,7 +594,7 @@ class FreeplayState extends MusicBeatState
 			characterSelectText = new FlxText(FlxG.width - 6, FlxG.height, 0, LanguageManager.getTextString("freeplay_skipChar"), 18);
 			characterSelectText.setFormat("Comic Sans MS Bold", 18, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			characterSelectText.borderSize = 1.5;
-			characterSelectText.antialiasing = true;
+			characterSelectText.antialiasing = FlxG.save.data.antialiasing;
 			characterSelectText.scrollFactor.set();
 			characterSelectText.alpha = 0;
 			characterSelectText.x -= characterSelectText.textField.textWidth;
@@ -799,12 +812,20 @@ class FreeplayState extends MusicBeatState
 						FlxG.save.data.randomNotes = false;
 						randomOption.text = FlxG.save.data.randomNotes ? "Randomize Notes: On (R)" : "Randomize Notes: Off (R)";
 					}
+					FlxG.save.flush();
 				}
 			if (FlxG.keys.justPressed.O)
 				{
 					FlxG.save.data.oppM = !FlxG.save.data.oppM;
 					oppOption.text = FlxG.save.data.oppM ? "Oppenent Mode: On (O)" : "Oppenent Mode: Off (O)";
+					FlxG.save.flush();
 				}
+				if (FlxG.keys.justPressed.Y)
+					{
+						FlxG.save.data.csAllSongs = !FlxG.save.data.csAllSongs;
+						csaText.text = FlxG.save.data.csAllSongs ? "Character Select on All Songs: On (Y)" : "Character Select on All Songs: Off (Y)";
+						FlxG.save.flush();
+					}
 				if (FlxG.keys.justPressed.R)
 					{
 						FlxG.save.data.randomNotes = !FlxG.save.data.randomNotes;
@@ -813,6 +834,7 @@ class FreeplayState extends MusicBeatState
 							FlxG.save.data.maniabutyeah = 0;
 							keyOption.text = "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)";
 						}
+						FlxG.save.flush();
 					}
 					if (FlxG.keys.justPressed.U)
 						{
@@ -823,6 +845,7 @@ class FreeplayState extends MusicBeatState
 						
 							keyOption.text = "Keys Added: " + FlxG.save.data.maniabutyeah + " (U)";
 						   }
+						   FlxG.save.flush();
 						}
 						if (FlxG.keys.justPressed.I)
 							{
@@ -831,17 +854,20 @@ class FreeplayState extends MusicBeatState
 								FlxG.save.data.randomNoteTypes = 0;
 							
 								rNText.text = "Randomly Place Note Types: " + rPNT[FlxG.save.data.randomNoteTypes] + " (I)";
+								FlxG.save.flush();
 							}
 
 				if (FlxG.keys.justPressed.B)
 				{
 					FlxG.save.data.botplay = !FlxG.save.data.botplay;
 					botplayOption.text = FlxG.save.data.botplay ? "Botplay: On (B)" : "Botplay: Off (B)";
+					FlxG.save.flush();
 				}
 				if (FlxG.keys.justPressed.P)
 				{
 					FlxG.save.data.practiceMode = !FlxG.save.data.practiceMode;
 					pModeOption.text = FlxG.save.data.practiceMode ? "Practice Mode: On (P)" : "Practice Mode: Off (P)";
+					FlxG.save.flush();
 				}
 			if (controls.BACK && canInteract)
 			{				
@@ -995,7 +1021,7 @@ class FreeplayState extends MusicBeatState
 						PlayState.storyWeek = songs[curSelected].week;
 						
 						packTransitionDone = false;
-						if ((FlxG.keys.pressed.CONTROL || skipSelect.contains(PlayState.SONG.song.toLowerCase())) && !(PlayState.SONG.song.toLowerCase() == 'exploitation' && !FlxG.save.data.modchart))
+						if ((FlxG.keys.pressed.CONTROL || skipSelect.contains(PlayState.SONG.song.toLowerCase())) /*&& !(PlayState.SONG.song.toLowerCase() == 'exploitation'*/ && !FlxG.save.data.modchart && !FlxG.save.data.csAllSongs)
 						{
 							if (curDifficulty == 0) {
 								if (PlayState.SONG.song.toLowerCase() == 'roofs') {

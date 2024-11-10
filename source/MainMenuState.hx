@@ -1,5 +1,6 @@
 package;
 
+import options.OptionsMenu;
 import flixel.addons.ui.FlxInputText;
 import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
@@ -74,7 +75,7 @@ class MainMenuState extends MusicBeatState
 
 	public static var daRealEngineVer:String = 'Dave';
 	public static var engineVer:String = '3.0b';
-	public static var fanmadeEngineVer:String = '2.0.0';
+	public static var fanmadeEngineVer:String = '2.5.1';
 
 	public static var engineVers:Array<String> = 
 	[
@@ -144,6 +145,7 @@ class MainMenuState extends MusicBeatState
 		persistentUpdate = persistentDraw = true;
 
 		#if desktop
+		if (FlxG.save.data.discord)
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 		
@@ -191,7 +193,7 @@ class MainMenuState extends MusicBeatState
 			bg.setGraphicSize(Std.int(bg.width * 1.1));
 			bg.updateHitbox();
 			bg.screenCenter();
-			bg.antialiasing = true;
+			bg.antialiasing = FlxG.save.data.antialiasing;
 			bg.color = 0xFFFDE871;
 			add(bg);
 	
@@ -201,13 +203,13 @@ class MainMenuState extends MusicBeatState
 			magenta.updateHitbox();
 			magenta.screenCenter();
 			magenta.visible = false;
-			magenta.antialiasing = true;
+			magenta.antialiasing = FlxG.save.data.antialiasing;
 			magenta.color = 0xFFfd719b;
 			add(magenta);
 		}
 		selectUi = new FlxSprite(0, 0).loadGraphic(Paths.image('mainMenu/Select_Thing', 'preload'));
 		selectUi.scrollFactor.set(0, 0);
-		selectUi.antialiasing = true;
+		selectUi.antialiasing = FlxG.save.data.antialiasing;
 		selectUi.updateHitbox();
 		add(selectUi);
 
@@ -218,7 +220,7 @@ class MainMenuState extends MusicBeatState
 			bigIcons.animation.addByPrefix(optionShit[i], optionShit[i] == 'freeplay' ? 'freeplay0' : optionShit[i], 24);
 		}
 		bigIcons.scrollFactor.set(0, 0);
-		bigIcons.antialiasing = true;
+		bigIcons.antialiasing = FlxG.save.data.antialiasing;
 		bigIcons.updateHitbox();
 		bigIcons.animation.play(optionShit[0]);
 		bigIcons.screenCenter(X);
@@ -228,7 +230,7 @@ class MainMenuState extends MusicBeatState
 		curOptText.setFormat("Comic Sans MS Bold", 48, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		curOptText.scrollFactor.set(0, 0);
 		curOptText.borderSize = 2.5;
-		curOptText.antialiasing = true;
+		curOptText.antialiasing = FlxG.save.data.antialiasing;
 		curOptText.screenCenter(X);
 		curOptText.y = FlxG.height / 2 + 28;
 		add(curOptText);
@@ -237,7 +239,7 @@ class MainMenuState extends MusicBeatState
 		curOptDesc.setFormat("Comic Sans MS Bold", 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		curOptDesc.scrollFactor.set(0, 0);
 		curOptDesc.borderSize = 2;
-		curOptDesc.antialiasing = true;
+		curOptDesc.antialiasing = FlxG.save.data.antialiasing;
 		curOptDesc.screenCenter(X);
 		curOptDesc.y = FlxG.height - 58;
 		add(curOptDesc);
@@ -293,15 +295,15 @@ class MainMenuState extends MusicBeatState
 		firstStart = false;
 
 		var versionShit:FlxText = new FlxText(1, FlxG.height - 70, 0, 'Fanmade Dave Engine v${fanmadeEngineVer}\n${daRealEngineVer} Engine v${engineVer}\nExtra Keys Addon v2.0.2\n', 12);
-		versionShit.antialiasing = true;
+		versionShit.antialiasing = FlxG.save.data.antialiasing;
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("Comic Sans MS Bold", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
-		var pressR:FlxText = new FlxText(225, 10, 0, LanguageManager.getTextString("main_resetdata"), 12);
+		var pressR:FlxText = new FlxText(245, 0, 0, '${LanguageManager.getTextString("main_resetdata")}\nPress T to delete base game', 12);
 		pressR.setFormat("Comic Sans MS Bold", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		pressR.x -= versionShit.textField.textWidth;
-		pressR.antialiasing = true;
+		pressR.antialiasing = FlxG.save.data.antialiasing;
 		pressR.alpha = 0;
 		pressR.scrollFactor.set();
 		add(pressR);
@@ -344,6 +346,12 @@ class MainMenuState extends MusicBeatState
 				
 				FlxG.camera.shake(0.05, 0.1);
 			}
+			if (FlxG.keys.justPressed.T)
+				{
+					FlxG.sound.play(Paths.sound('scrollMenu'));
+					FlxG.switchState(new BaseGameDeleter());
+					
+				}
 			if (FlxG.keys.justPressed.R)
 			{
 				FlxG.sound.play(Paths.sound('scrollMenu'));
@@ -431,6 +439,7 @@ class MainMenuState extends MusicBeatState
 					selectedSomethin = true;
 					FlxG.sound.play(Paths.sound('confirmMenu'));
 
+					if (FlxG.save.data.flashing)
 					FlxFlicker.flicker(magenta, 1.1, 0.15, false);
 
 					menuItems.forEach(function(spr:FlxSprite)
@@ -447,6 +456,7 @@ class MainMenuState extends MusicBeatState
 						}
 						else
 						{
+							if (FlxG.save.data.flashing) {
 							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 							{
 								var daChoice:String = optionShit[curSelected];
@@ -468,6 +478,26 @@ class MainMenuState extends MusicBeatState
 										FlxG.switchState(new CreditsMenuState());
 								}
 							});
+						} else {
+							var daChoice:String = optionShit[curSelected];
+								switch (daChoice)
+								{
+									case 'story mode':
+										FlxG.switchState(new StoryMenuState());
+									case 'freeplay' | 'freeplay glitch':
+										if (FlxG.random.bool(0.05))
+										{
+											fancyOpenURL("https://www.youtube.com/watch?v=Z7wWa1G9_30%22");
+										}
+										FlxG.switchState(new FreeplayState());
+									case 'options':
+										FlxG.switchState(new OptionsMenu());
+									case 'ost':
+										FlxG.switchState(new MusicPlayerState());
+									case 'credits':
+										FlxG.switchState(new CreditsMenuState());
+								}
+						}
 						}
 					});
 				}
@@ -547,6 +577,10 @@ class MainMenuState extends MusicBeatState
 		{
 			return Paths.image('backgrounds/ramzgaming');
 		}
+		else if (FlxG.random.bool(0.05))
+		{
+			return Paths.image('backgrounds/nostalgia/' + FlxG.random.int(0,8));
+		}
 		else
 		{
 			return Paths.image('backgrounds/${bgPaths[chance]}');
@@ -604,7 +638,7 @@ class Prompt extends FlxSpriteGroup
 		promptText.screenCenter(X);
 		promptText.scrollFactor.set(0, 0);
 		promptText.borderSize = 2.5;
-		promptText.antialiasing = true;
+		promptText.antialiasing = FlxG.save.data.antialiasing;
 		add(promptText);
 
 		noText = new FlxText(0, FlxG.height / 2 + 100, 0, "No", 16);
@@ -613,7 +647,7 @@ class Prompt extends FlxSpriteGroup
 		noText.setFormat("Comic Sans MS Bold", 40, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		noText.scrollFactor.set(0, 0);
 		noText.borderSize = 1.5;
-		noText.antialiasing = true;
+		noText.antialiasing = FlxG.save.data.antialiasing;
 		add(noText);
 
 		yesText = new FlxText(0, FlxG.height / 2 + 100, 0, "Yes", 16);
@@ -714,7 +748,7 @@ class Prompt extends FlxSpriteGroup
 	{
 		FlxG.sound.play(Paths.sound('confirmMenu'));
 		var select = texts.indexOf(text);
-
+if (FlxG.save.data.flashing) {
 		FlxFlicker.flicker(text, 1.1, 0.1, false, false, function(flicker:FlxFlicker)
 		{
 			switch (select)
@@ -725,5 +759,14 @@ class Prompt extends FlxSpriteGroup
 					noFunc();
 			}
 		});
+	} else {
+		switch (select)
+			{
+				case 0:
+					yesFunc();
+				case 1:
+					noFunc();
+			}
 	}
+}
 }

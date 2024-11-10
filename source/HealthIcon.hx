@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.graphics.FlxGraphic;
 import openfl.display.BitmapData;
+import flixel.FlxG;
 
 
 class HealthIcon extends FlxSprite
@@ -25,7 +26,6 @@ class HealthIcon extends FlxSprite
 	var state:String;
 	public var isPlayer:Bool;
 	var winningIcon:Bool;
-	var blank:Bool = false;
 	
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
@@ -49,21 +49,19 @@ class HealthIcon extends FlxSprite
 				} else {
 					file = FlxGraphic.fromBitmapData(BitmapData.fromFile(Paths.image('ui/iconGrid/' + char, 'preload')));
 				}
-				} else if (FileSystem.exists('mods/global characters/images/icons/' + char + '.png')) {
-				file = Paths.customImage('mods/global characters/images/icons/' + char);
+				} else if (FileSystem.exists('mods/global/images/icons/' + char + '.png')) {
+				file = Paths.customImage('mods/global/images/icons/' + char);
 				} else if  (FileSystem.exists(TitleState.modFolder + '/images/icons/' + char + '.png')) {
 				file = Paths.customImage(TitleState.modFolder + '/images/icons/' + char);
 				} else {
 					//trace('lol');
-					blank = true;
-					file = Paths.image('blank', 'shared');
+					file = FlxGraphic.fromBitmapData(BitmapData.fromFile(Paths.image('ui/iconGrid/face', 'preload')));
 				}
 			} else {
-				blank = true;
 				file = Paths.image('blank', 'shared');
 			}
 
-			if (char != "none" && !blank) {
+			if (char != "none") {
 			loadGraphic(file);	
 			if (width == 450) {
 			loadGraphic(file, true, Math.floor(width / 3), 150);	
@@ -73,9 +71,9 @@ class HealthIcon extends FlxSprite
 			}
 		}
 			
-			if (char != "none" && !blank)
+			if (char != "none")
 			{
-				antialiasing = !noAaChars.contains(char);
+				antialiasing = !noAaChars.contains(char) ? FlxG.save.data.antialiasing : !noAaChars.contains(char);
 				//trace('Graphic width before setting: ' + width);
 				if (winningIcon) {
 				//trace('winning :) added');
@@ -98,7 +96,7 @@ class HealthIcon extends FlxSprite
 	}
 	public function changeState(charState:String)
 	{
-		if (char != "none" && !blank) {
+		if (char != "none") {
 		switch (charState)
 		{
 			case 'normal':
@@ -127,7 +125,7 @@ class HealthIcon extends FlxSprite
 
 	public static function iconExists(check:String):Bool
 	{
-if (FileSystem.exists('assets/images/ui/iconGrid/' + check + '.png') || FileSystem.exists('mods/global characters/images/icons/' + check + '.png') || (FileSystem.exists(TitleState.modFolder + '/images/icons/' + check + '.png'))) {
+if (FileSystem.exists('assets/images/ui/iconGrid/' + check + '.png') || FileSystem.exists('mods/global/images/icons/' + check + '.png') || (FileSystem.exists(TitleState.modFolder + '/images/icons/' + check + '.png'))) {
 	return true;
 } else {
 	return false;

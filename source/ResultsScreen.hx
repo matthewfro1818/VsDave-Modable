@@ -59,12 +59,12 @@ class ResultsScreen extends FlxState
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
 		bg.updateHitbox();
 		bg.screenCenter();
-		bg.antialiasing = true;
+		bg.antialiasing = FlxG.save.data.antialiasing;
 		bg.color = 0xFF7F7F7F;
 		add(bg);
 
 	    info = new FlxText(FlxG.width - 1850, FlxG.height - 420, 0, !PlayState.isStoryMode ? 'Total Notes Hit: ${PlayState.rstotalNotesHit}\nMax Combo: ${PlayState.rscombo}\nScore: ${PlayState.rssongScore}\nMisses: ${PlayState.rsmisses}\nAccuracy: ${PlayState.rsaccuracy}%\nSicks: ${PlayState.rssicks}\nGoods: ${PlayState.rsgoods}\nBads: ${PlayState.rsbads}\nShits: ${PlayState.rsshits}' : 'Total Notes Hit: ${PlayState.rstotalNotesHit}\nMax Combo: ${PlayState.rscombo}\nScore: ${PlayState.rssongScore}\nMisses: ${PlayState.rsmisses}\nBest Accuracy: ${PlayState.rsaccuracy}%\nSicks: ${PlayState.rssicks}\nGoods: ${PlayState.rsgoods}\nBads: ${PlayState.rsbads}\nShits: ${PlayState.rsshits}', 12);
-		info.antialiasing = true;
+		info.antialiasing = FlxG.save.data.antialiasing;
 		info.scrollFactor.set();
 		info.setFormat("Comic Sans MS Bold", 30, FlxColor.BLACK, LEFT);
 		info.alpha = 1;
@@ -80,14 +80,14 @@ class ResultsScreen extends FlxState
 		}
 
 		info2 = new FlxText(FlxG.width - 1850, FlxG.height - 630, 0, '${score}% - ${PlayState.rssong} ${credit}', 12);
-		info2.antialiasing = true;
+		info2.antialiasing = FlxG.save.data.antialiasing;
 		info2.scrollFactor.set();
 		info2.setFormat("Comic Sans MS Bold", 25, FlxColor.BLACK, LEFT);
 		info2.alpha = 1;
 		add(info2);
 
 		notesTxt = new FlxText(0, 0, 0, score + '%', 12);
-		notesTxt.antialiasing = true;
+		notesTxt.antialiasing = FlxG.save.data.antialiasing;
 		notesTxt.scrollFactor.set();
 		notesTxt.setFormat("Comic Sans MS Bold", 200, FlxColor.BLACK, CENTER);
 		notesTxt.screenCenter();
@@ -130,7 +130,7 @@ class ResultsScreen extends FlxState
 			endIt();
 		}
 		if (characterStuff) {
-		if (theNotes == 100) {
+		if (theNotes >= 100) {
 			var hitAnimation:Bool = bf.animation.getByName("dodge") != null;
 			var heyAnimation:Bool = bf.animation.getByName("hey") != null;
 			if (bf.animation.finished) {
@@ -168,14 +168,29 @@ class ResultsScreen extends FlxState
 		if(FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
-		PlayState.allNotes = 0;
-		PlayState.isHighscore = false;
+
+		resetVars();
 if (!PlayState.isStoryMode) {
         FlxG.switchState(new FreeplayState());
 } else {
 	FlxG.switchState(new StoryMenuState());	
 }
 	}
+	public function resetVars()
+		{
+		PlayState.rssongScore = 0;
+        PlayState.rsmisses = 0;
+        PlayState.rsaccuracy = 0.00;
+        PlayState.rsshits = 0;
+        PlayState.rsbads = 0;
+        PlayState.rsgoods = 0;
+        PlayState.rssicks = 0;
+        PlayState.rscombo = 0;
+        PlayState.rstotalNotesHit = 0;
+	    PlayState.rssong = '';
+		PlayState.allNotes = 0;
+		PlayState.isHighscore = false;
+		}
 
 	public function tally() // hall
 		{
@@ -211,7 +226,7 @@ if (!PlayState.isStoryMode) {
 					}
 					
 					
-                    if (theNotes == 100) {
+                    if (theNotes >= 100) {
 						bg.color = 0xFFD4D400;
 						FlxTween.color(notesTxt, 0.3, notesTxt.color, FlxColor.YELLOW);
 					} else if (theNotes >= 90) {
@@ -244,7 +259,7 @@ if (!PlayState.isStoryMode) {
 				if(FlxG.sound.music != null)
 					FlxG.sound.music.stop();
 
-				if (theNotes == 100) {
+				if (theNotes >= 100) {
 				FlxG.sound.playMusic(Paths.music('cornGame'),1,true); // banger
 				if (HealthIcon.iconExists(PlayState.gfVersion)) {
 					gf.changeState('winning');
@@ -274,7 +289,7 @@ if (!PlayState.isStoryMode) {
 				FlxTween.tween(bf,{y: 360}, 2.5, {ease: FlxEase.expoInOut});
 				if (HealthIcon.iconExists(PlayState.gfVersion)) {
 				FlxTween.tween(gf,{x: 1100}, 3.2, {ease: FlxEase.expoInOut});
-				if (theNotes == 100) {
+				if (theNotes >= 100) {
 				gfStuff();
 				}
 				}

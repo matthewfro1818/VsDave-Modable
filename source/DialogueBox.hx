@@ -61,7 +61,7 @@ class DialogueBox extends FlxSpriteGroup
 	var debug:Bool = false;
 
 	var curshader:Dynamic;
-	var custom:Array<String>;
+	var custom:String;
 
 	public var rawJsonDial:String;
     public var jsonDial:DiaCharacter;
@@ -78,8 +78,10 @@ class DialogueBox extends FlxSpriteGroup
 	{
 		super();
 
-		if (FileSystem.exists(TitleState.modFolder + '/data/charts/' + PlayState.SONG.song.toLowerCase() + '-dia.txt')) {
-			custom = CoolUtil.coolTextFile(TitleState.modFolder + '/data/charts/' + PlayState.SONG.song.toLowerCase() + '-dia.txt');
+		if (PlayState.settingsExist && PlayState.jsonSettings.dialogueMusic != null) {
+			custom = PlayState.jsonSettings.dialogueMusic;
+			} else {
+			custom = '';
 			}
 		
 		if (playMusic)
@@ -120,19 +122,13 @@ class DialogueBox extends FlxSpriteGroup
 				case 'rano':
 					FlxG.sound.playMusic(Paths.music('stocknightambianceforranolol'), 0);	
 				default:
-					if (FileSystem.exists(TitleState.modFolder + '/data/charts/' + PlayState.SONG.song.toLowerCase() + '-dia.txt')) {
-						for (i in 0...custom.length)
-							{
-								var data:Array<String> = custom[i].split(':');
-								if (data[0] == null) {
+					if (PlayState.settingsExist) {
+								if (custom == '') {
 								FlxG.sound.music.stop();
 								} else {
-								FlxG.sound.playMusic(Paths.music(data[0]), 0);	
+								FlxG.sound.playMusic(Paths.music(custom), 0);	
 								}
 							}
-					} else {
-					FlxG.sound.music.stop();
-					}
 			}
 			FlxG.sound.music.fadeIn(1, 0, 0.8);
 		}
@@ -157,7 +153,7 @@ class DialogueBox extends FlxSpriteGroup
 		box.updateHitbox();
 		box.animation.addByPrefix('normalOpen', 'Speech Bubble Normal Open', 24, false);
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24, true);
-		box.antialiasing = true;
+		box.antialiasing = FlxG.save.data.antialiasing;
 		
 		if (!PlayState.instance.hasDialogue)
 			return;
@@ -241,25 +237,25 @@ class DialogueBox extends FlxSpriteGroup
 				dropText = new FlxText(242, 502, Std.int(FlxG.width * 0.6), "", 32);
 				dropText.font = 'Comic Sans MS Bold';
 				dropText.color = PlayState.instance.localFunny != PlayState.CharacterFunnyEffect.Recurser ? 0xFFFFFFFF : 0xFF00137F;
-				dropText.antialiasing = true;
+				dropText.antialiasing = FlxG.save.data.antialiasing;
 				add(dropText);
 			
 				swagDialogue = new FlxTypeText(240, 500, Std.int(FlxG.width * 0.6), "", 32);
 				swagDialogue.font = 'Comic Sans MS Bold';
 				swagDialogue.color = 0xFF000000;
-				swagDialogue.antialiasing = true;
+				swagDialogue.antialiasing = FlxG.save.data.antialiasing;
 				add(swagDialogue);
 			default:
 				dropText = new FlxText(242, 502, Std.int(FlxG.width * 0.6), "", 32);
 				dropText.font = 'Comic Sans MS Bold';
 				dropText.color = 0xFF00137F;
-				dropText.antialiasing = true;
+				dropText.antialiasing = FlxG.save.data.antialiasing;
 				add(dropText);
 		
 				swagDialogue = new FlxTypeText(240, 500, Std.int(FlxG.width * 0.6), "", 32);
 				swagDialogue.font = 'Comic Sans MS Bold';
 				swagDialogue.color = 0xFF000000;
-				swagDialogue.antialiasing = true;
+				swagDialogue.antialiasing = FlxG.save.data.antialiasing;
 				add(swagDialogue);
 		}
 		dialogue = new Alphabet(0, 80, "", false, true);
@@ -416,7 +412,7 @@ class DialogueBox extends FlxSpriteGroup
 					portraitRight.setPosition(570, 220);
 				default:
 				if (FileSystem.exists(TitleState.modFolder + '/data/characters/dialogue/${curCharacter}.json')) {
-					trace(TitleState.modFolder + '/data/characters/dialogue/${curCharacter}.json');
+				//	trace(TitleState.modFolder + '/data/characters/dialogue/${curCharacter}.json');
 			    rawJsonDial = File.getContent((TitleState.modFolder + '/data/characters/dialogue/${curCharacter}.json'));
 			    jsonDial = cast Json.parse(rawJsonDial);
 				if (jsonDial.right) {

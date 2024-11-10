@@ -1,3 +1,21 @@
+# ABOUT DEVELOPMENT 
+- I feel like working on this again!
+- stuff im planning to add:
+- [DONE] version checker
+- Events (play animations, change characters, etc)
+- Compatibility with other engines
+- [DONE] option pack saver (saving all the options into a json that you can put back into the game) 
+- [DONE] changing camera position for characters
+- [DONE] base game deleter (deletes stuff from the base game that is not needed so you have space for mods)
+- maybe more things (I can't think of anything else right now)
+
+btw suggest me stuff (btw im not that good of a coder) to add to this engine by going to the issues tab
+
+# KNOWN BUGS
+Ok weirdest thing, on some charts some notes are completely invisible and unhittable by the player. Bad thing is I have no idea how to fix this.
+I think it's caused by Psych Engine charts (0.6.3 and below) so just use later versions of psych engine for charting
+https://youtu.be/5WubHTTSAyA
+
 <img src="KadeEngineWitBackground.png">
 
 # VS DAVE (DAVE ENGINE)

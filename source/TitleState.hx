@@ -1,5 +1,7 @@
 package;
 
+import haxe.Json;
+import sys.io.File;
 import flixel.FlxSubState;
 import sys.FileSystem;
 import haxe.Http;
@@ -34,6 +36,15 @@ import haxe.Json;
 
 using StringTools;
 
+typedef BGDJson =
+{
+	var deletedCharts:Bool;
+	var deletedSongs:Bool;
+	var deletedCharacterImages:Bool;
+	var deletedIcons:Bool;
+	var deletedStoryMenu:Bool;
+}
+
 class TitleState extends MusicBeatState
 {
 	public static var initialized:Bool = false;
@@ -51,10 +62,12 @@ class TitleState extends MusicBeatState
 	var awaitingExploitation:Bool;
 	var eye:FlxSprite;
 	var loopEyeTween:FlxTween;
+	public static var baseGameDeleted:BGDJson;
 	public static var mods:Array<String> = [];
 	public static var currentMod:String = 'test';
 	public static var modFolder:String = '';
 	public static var onlyforabug:Bool = false;
+	public static var checkedVersion:Bool;
 
 	
 	override public function create():Void
@@ -128,11 +141,26 @@ class TitleState extends MusicBeatState
 		
 		if(FileSystem.exists('mods')) {
 			for (folder in FileSystem.readDirectory('mods')){
-				if (FileSystem.isDirectory('mods/' + folder) && !mods.contains(folder) && folder != 'global characters')
+				if (FileSystem.isDirectory('mods/' + folder) && !mods.contains(folder) && folder != 'global')
 					mods.push(folder);
 			}
 			}
 			trace(mods + ' ' + currentMod);
+			var rawBGDJson:String;
+			
+			if (FileSystem.exists(Paths.json('BaseGameDeleter'))) {
+			 rawBGDJson = File.getContent(Paths.json('BaseGameDeleter'));
+			if(rawBGDJson != null) {
+				baseGameDeleted = cast Json.parse(rawBGDJson);
+			}
+
+		} else {
+			 rawBGDJson = '{"deletedCharts":false,"deletedCharacterImages":false,"deletedSongs":false,"deletedIcons":false,"deletedStoryMenu":false}';
+			if(rawBGDJson != null) {
+				baseGameDeleted = cast Json.parse(rawBGDJson);
+			}
+		}
+		
 
 		new FlxTimer().start(1, function(tmr:FlxTimer)
 		{
@@ -177,7 +205,7 @@ class TitleState extends MusicBeatState
         
 
 		versionShit = new FlxText(1, FlxG.height - 70, 0, 'Press M to Open the Mod Menu\nPress W to go to the wiki\nPress S to turn on or off Shaders: ' + shaderThing, 20);
-		versionShit.antialiasing = true;
+		versionShit.antialiasing = FlxG.save.data.antialiasing;
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("Comic Sans MS Bold", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
@@ -194,7 +222,7 @@ class TitleState extends MusicBeatState
 			FlxG.save.data.modchart = false;
 			FlxG.save.data.botplay = false;
 		}
-		logoBl.antialiasing = true;
+		logoBl.antialiasing = FlxG.save.data.antialiasing;
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
 		logoBl.setGraphicSize(Std.int(logoBl.width * 1.2));
 		logoBl.animation.play('bump');
@@ -229,7 +257,7 @@ class TitleState extends MusicBeatState
 			gfDance.frames = Paths.getSparrowAtlas('ui/gfDanceTitle');
 			gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 			gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-			gfDance.antialiasing = true;
+			gfDance.antialiasing = FlxG.save.data.antialiasing;
 			add(gfDance);
 		}
 		add(logoBl);
@@ -239,7 +267,7 @@ class TitleState extends MusicBeatState
 		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 		titleText.animation.addByPrefix('press', "ENTER PRESSED", 18, false);
 		titleText.screenCenter(X);
-		titleText.antialiasing = true;
+		titleText.antialiasing = FlxG.save.data.antialiasing;
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
 		add(titleText);
@@ -252,7 +280,7 @@ class TitleState extends MusicBeatState
 		credGroup.add(blackScreen);
 
 		credTextShit = new Alphabet(0, 0, "MoldyGH\nMissingTextureMan101\nRapparep\nZmac\nTheBuilder\nT5mpler\nErizur", true);
-		credTextShit.antialiasing = true;
+		credTextShit.antialiasing = FlxG.save.data.antialiasing;
 		credTextShit.screenCenter();
 
 		// credTextShit.alignment = CENTER;
@@ -365,6 +393,7 @@ class TitleState extends MusicBeatState
 			//trace(onlyforabug);
 			titleText.animation.play('press');
 
+			if (FlxG.save.data.flashing != null && FlxG.save.data.flashing)
 			FlxG.camera.flash(FlxColor.WHITE, 0.5);
 			FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
 
@@ -375,6 +404,29 @@ class TitleState extends MusicBeatState
 			/*	#if debug
 				FlxG.save.data.exploitationState = null;
 				#end */
+                if (FlxG.save.data.checkVersion) {
+				var http = new haxe.Http("https://raw.githubusercontent.com/CamtheKirby/VsDave-Modable/refs/heads/main/version.downloadMe");
+				var returnedData:Array<String> = [];
+
+				http.onData = function(data:String)
+					{
+						returnedData[0] = data.substring(0, data.indexOf(';'));
+						returnedData[1] = data.substring(data.indexOf('-'), data.length);
+						if (!MainMenuState.kadeEngineVer.contains(returnedData[0].trim()) && !checkedVersion)
+						{
+							fancyOpenURL("https://github.com/CamtheKirby/VsDave-Modable/releases/latest");
+						}
+						checkedVersion = true;
+					}
+	
+					http.onError = function(error)
+					{
+						trace('error: $error');
+					}
+	
+					http.request();
+				}
+
 				FlxG.switchState(FlxG.save.data.alreadyGoneToWarningScreen && FlxG.save.data.exploitationState != 'playing' ? new MainMenuState() : new OutdatedSubState());
 			});
 		}
@@ -396,7 +448,8 @@ class TitleState extends MusicBeatState
 		{
 			remove(credGroup);
 			skippedIntro = true;
-	
+			
+			if (FlxG.save.data.flashing != null && FlxG.save.data.flashing)
 			FlxG.camera.fade(FlxColor.WHITE, 2.5, true);
 		}
 	}
@@ -462,7 +515,7 @@ class TitleState extends MusicBeatState
 		{
 			var money:FlxText = new FlxText(0, 0, FlxG.width, textArray[i], 48);
 			money.setFormat("Comic Sans MS Bold", 48, FlxColor.WHITE, CENTER);
-			money.antialiasing = true;
+			money.antialiasing = FlxG.save.data.antialiasing;
 			money.screenCenter(X);
 			money.y += (i * 60) + 200;
 			credGroup.add(money);
@@ -475,7 +528,7 @@ class TitleState extends MusicBeatState
 		var coolText:FlxText = new FlxText(0, 0, FlxG.width, text, 48);
 		coolText.setFormat("Comic Sans MS Bold", 48, FlxColor.WHITE, CENTER);
 		coolText.screenCenter(X);
-		coolText.antialiasing = true;
+		coolText.antialiasing = FlxG.save.data.antialiasing;
 		coolText.y += (textGroup.length * 60) + 200;
 		credGroup.add(coolText);
 		textGroup.add(coolText);
